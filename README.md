@@ -6,17 +6,17 @@ To setup this demo:
    ```bash
    git clone https://github.com/kevincloud/vault-aws-demo.git
    ```
-2. In the `server` directory in the project directory, create a `terraform.tfvars` file and supply the following information:
+2. Create a `terraform.tfvars` file and supply the following information:
    ```
-   aws_access_key=
-   aws_secret_key=
-   key_pair=
+   aws_access_key=<YOUR_AWS_ACCESS_KEY>
+   aws_secret_key=<YOUR_AWS_SECRET_KEY>
+   key_pair=<YOUR_AWS_KEY_PAIR>
    ```
 3. Deploy the infrastructure
    ```bash
    terraform apply
    ```
-4. Login to the vault server. The `vault-login` output from terraform contains an ssh command, though the key name and location may need to be modified.
+4. Login to the vault server. The `vault-login` output from terraform contains an ssh command, though the key name and location may need to be modified to match your environment.
 
 ### Implementing Auto Unseal
 
