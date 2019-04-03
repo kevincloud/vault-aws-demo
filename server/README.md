@@ -26,6 +26,12 @@ Make sure you have already created a managed key in KMS. We'll need that key id.
 
 #### Step 1. Update Vault Configuration
 
+Once you're logged in, for the sake of simplicity, let's go ahead and login as root:
+
+```bash
+sudo su -
+```
+
 We'll need to add a few lines to Vault's configuration file, so let's start by stopping the vault service:
 
 ```bash
