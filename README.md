@@ -20,7 +20,7 @@ To setup this demo:
 
 ### Implementing Auto Unseal
 
-This Vault instance is using defaults to manage the master key, using shamir. Since we're likely to already have secrets, we really don't want to re-initialize Vault. Instead, we'll migrate from Shamir to AWS KMS.
+This Vault instance is using defaults to manage the master key, using Shamir's secret sharing. Since we're likely to already have secrets, we really don't want to re-initialize Vault. Instead, we'll migrate from Shamir to AWS KMS.
 
 Make sure you have already created a managed key in KMS. We'll need that key id.
 
@@ -42,7 +42,7 @@ Using your favorite editor, edit the `/etc/vault.d/vault.hcl` file and add these
 
 ```hcl
 seal "awskms" {
-    region = "us-west-1"
+    region = "us-west-2"
     kms_key_id = "<KEYID>"
 }
 ```
@@ -97,4 +97,34 @@ You'll see it is unsealed by default:
 ...
 Sealed                   false
 ...
+```
+
+We're not quite done. Since our master key is managed by an external trusted source, we need to migrate away from a shared key to a single key.
+
+```bash
+vault operator rekey -init -target=recovery -key-shares=1 -key-threshold=1
+```
+
+Once again, we'll need our unseal keys from before as well as the nonce token provided after the rekey initialization:
+
+```bash
+vault operator rekey -target=recovery -key-shares=1 -key-threshold=1 -nonce=<NONCE_TOKEN> <UNSEAL_KEY_1>
+vault operator rekey -target=recovery -key-shares=1 -key-threshold=1 -nonce=<NONCE_TOKEN> <UNSEAL_KEY_2>
+vault operator rekey -target=recovery -key-shares=1 -key-threshold=1 -nonce=<NONCE_TOKEN> <UNSEAL_KEY_3>
+```
+
+Review the status of vault to ensure all settings are correct:
+
+```bash
+Key                      Value
+---                      -----
+Recovery Seal Type       shamir
+Initialized              true
+Sealed                   false
+Total Recovery Shares    1
+Threshold                1
+Version                  1.1.0
+Cluster Name             vault-cluster-efcdaac3
+Cluster ID               efe63829-a886-1d8d-3c5e-73cb5bc5cf3f
+HA Enabled               false
 ```
