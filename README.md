@@ -115,7 +115,13 @@ vault operator rekey -target=recovery -key-shares=1 -key-threshold=1 -nonce=<NON
 vault operator rekey -target=recovery -key-shares=1 -key-threshold=1 -nonce=<NONCE_TOKEN> <UNSEAL_KEY_3>
 ```
 
-Review the status of vault to ensure all settings are correct:
+Review the status of vault...
+
+```bash
+vault status
+```
+
+...to ensure all settings are correct:
 
 ```bash
 Key                      Value
