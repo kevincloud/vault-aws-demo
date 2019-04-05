@@ -137,8 +137,26 @@ Cluster ID               efe63829-a886-1d8d-3c5e-73cb5bc5cf3f
 HA Enabled               false
 ```
 
-Your AWS credentials were automatically added to vault during setup. To verify all data is still intact, simply look up your credentials:
+Some fake credentials were automatically added to vault during setup. To verify all data is still intact, simply look up your credentials:
 
 ```bash
-vault kv get secret/aws
+vault kv get secret/creds
+```
+
+You should see:
+
+```bash
+====== Metadata ======
+Key              Value
+---              -----
+created_time     2019-04-05T18:01:18.980320626Z
+deletion_time    n/a
+destroyed        false
+version          1
+
+====== Data ======
+Key         Value
+---         -----
+password    Super$ecret1
+username    vault_user
 ```

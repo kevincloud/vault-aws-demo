@@ -85,4 +85,10 @@ curl \
     --data '{"data": { "aws_access_key": "${AWS_ACCESS_KEY}", "aws_secret_key": "${AWS_SECRET_KEY}" } }' \
     http://127.0.0.1:8200/v1/secret/data/aws
 
+curl \
+    --header "X-Vault-Token: $VAULT_TOKEN" \
+    --request POST \
+    --data '{"data": { "username": "vault_user", "password": "Super$ecret1" } }' \
+    http://127.0.0.1:8200/v1/secret/data/creds
+
 echo "Vault installation complete."
