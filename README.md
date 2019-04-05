@@ -99,7 +99,9 @@ Sealed                   false
 ...
 ```
 
-We're not quite done. Since our master key is managed by an external trusted source, we need to migrate away from a shared key to a single key.
+#### Step 3. Remove Key Shares
+
+We're almost done. Since our master key is managed by an external trusted source, we need to migrate away from a shared key to a single key.
 
 ```bash
 vault operator rekey -init -target=recovery -key-shares=1 -key-threshold=1
@@ -127,4 +129,10 @@ Version                  1.1.0
 Cluster Name             vault-cluster-efcdaac3
 Cluster ID               efe63829-a886-1d8d-3c5e-73cb5bc5cf3f
 HA Enabled               false
+```
+
+Your AWS credentials were automatically added to vault during setup. To verify all data is still intact, simply look up your credentials:
+
+```bash
+vault kv get secret/aws
 ```
