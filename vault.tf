@@ -6,6 +6,11 @@ data "template_file" "vault_setup" {
     vars = {
         AWS_ACCESS_KEY = "${var.aws_access_key}"
         AWS_SECRET_KEY = "${var.aws_secret_key}"
+        AMI_ID = "${data.aws_ami.ubuntu.id}"
+        MYSQL_HOST = "${aws_db_instance.vault-mysql.endpoint}"
+        MYSQL_USER = "${var.mysql_user}"
+        MYSQL_PASS = "${var.mysql_pass}"
+        AWS_KMS_KEY_ID = "${var.kms_key_id}"
     }
 }
 
@@ -15,7 +20,6 @@ resource "aws_instance" "vault-server" {
     key_name = "${var.key_pair}"
     vpc_security_group_ids = ["${aws_security_group.vault-server-sg.id}"]
     user_data = "${data.template_file.vault_setup.rendered}"
-    # subnet_id = "${aws_subnet.public-subnet.id}"
     iam_instance_profile = "${aws_iam_instance_profile.vault-kms-unseal.id}"
     
     tags = {
@@ -31,6 +35,20 @@ resource "aws_security_group" "vault-server-sg" {
     ingress {
         from_port = 22
         to_port = 22
+        protocol = "tcp"
+        cidr_blocks = ["0.0.0.0/0"]
+    }
+
+    ingress {
+        from_port = 80
+        to_port = 80
+        protocol = "tcp"
+        cidr_blocks = ["0.0.0.0/0"]
+    }
+
+    ingress {
+        from_port = 5000
+        to_port = 5000
         protocol = "tcp"
         cidr_blocks = ["0.0.0.0/0"]
     }
