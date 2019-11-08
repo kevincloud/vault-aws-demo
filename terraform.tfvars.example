@@ -1,0 +1,12 @@
+# set variable values
+
+aws_access_key = "YOUR_AWS_ACCESS_KEY"
+aws_secret_key = "YOUR_AWS_SECRET_KEY"
+aws_region = "us-west-2"
+key_pair = "YOUR_KEY_PAIR"
+mysql_user = "root"
+mysql_pass = "SuperSecret1"
+mysql_dbname = "sedemovaultdb"
+kms_key_id = "YOUR_KMS_KEY_ID"
+vault_dl_url = "https://releases.hashicorp.com/vault/1.2.3+ent/vault_1.2.3+ent_linux_amd64.zip"
+vault_license = ""

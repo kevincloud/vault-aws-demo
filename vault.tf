@@ -11,6 +11,8 @@ data "template_file" "vault_setup" {
         MYSQL_USER = "${var.mysql_user}"
         MYSQL_PASS = "${var.mysql_pass}"
         AWS_KMS_KEY_ID = "${var.kms_key_id}"
+        VAULT_URL = "${var.vault_dl_url}"
+        VAULT_LICENSE = "${var.vault_license}"
     }
 }
 
@@ -95,17 +97,17 @@ data "aws_iam_policy_document" "vault-kms-unseal" {
 }
 
 resource "aws_iam_role" "vault-kms-unseal" {
-  name               = "vault-kms-role-unseal"
+  name               = "vault-demo-kms-role-unseal"
   assume_role_policy = "${data.aws_iam_policy_document.assume_role.json}"
 }
 
 resource "aws_iam_role_policy" "vault-kms-unseal" {
-  name   = "vault-kms-unseal"
+  name   = "vault-demo-kms-unseal"
   role   = "${aws_iam_role.vault-kms-unseal.id}"
   policy = "${data.aws_iam_policy_document.vault-kms-unseal.json}"
 }
 
 resource "aws_iam_instance_profile" "vault-kms-unseal" {
-  name = "vault-kms-unseal"
+  name = "vault-demo-kms-unseal"
   role = "${aws_iam_role.vault-kms-unseal.name}"
 }

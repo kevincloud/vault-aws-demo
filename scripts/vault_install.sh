@@ -24,8 +24,8 @@ aws_secret_access_key=${AWS_SECRET_KEY}
 EOF
 
 echo "Installing Vault..."
-wget https://releases.hashicorp.com/vault/1.1.0/vault_1.1.0_linux_amd64.zip
-sudo unzip vault_1.1.0_linux_amd64.zip -d /usr/local/bin/
+curl -sfLo "vault.zip" "${VAULT_URL}"
+sudo unzip vault.zip -d /usr/local/bin/
 
 # Server configuration
 sudo bash -c "cat >/etc/vault.d/vault.hcl" << 'EOF'
@@ -61,11 +61,19 @@ EOF
 
 sudo systemctl start vault
 sudo systemctl enable vault
+
+sleep 5
+
 export VAULT_IP=`curl -s http://169.254.169.254/latest/meta-data/public-ipv4`
 export VAULT_ADDR=http://localhost:8200
+# vault operator init -recovery-shares=1 -recovery-threshold=1 -key-shares=1 -key-threshold=1 > /root/init.txt 2>&1
 vault operator init -recovery-shares=1 -recovery-threshold=1 > /root/init.txt 2>&1
 export VAULT_TOKEN=`cat /root/init.txt | sed -n -e '/^Initial Root Token/ s/.*\: *//p'`
 export DB_HOST=`echo '${MYSQL_HOST}' | awk -F ":" '/1/ {print $1}'`
+
+sleep 5
+
+vault write sys/license text=${VAULT_LICENSE}
 
 # Setup demos
 UNSEAL_KEY_1=`cat /root/init.txt | sed -n -e '/^Unseal Key 1/ s/.*\: *//p'`
