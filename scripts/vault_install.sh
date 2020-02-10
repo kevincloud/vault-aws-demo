@@ -2,6 +2,11 @@
 # Configures the Vault server for a database secrets demo
 
 echo "Preparing to install Vault..."
+echo 'libc6 libraries/restart-without-asking boolean true' | sudo debconf-set-selections
+export DEBIAN_FRONTEND=noninteractive
+apt-get -y remove grub-pc
+apt-get -y install grub-pc
+update-grub
 sudo apt-get -y update > /dev/null 2>&1
 sudo apt-get -y upgrade > /dev/null 2>&1
 sudo apt-get install -y unzip jq cowsay mysql-client > /dev/null 2>&1

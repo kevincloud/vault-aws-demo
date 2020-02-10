@@ -6,6 +6,8 @@ variable "aws_region" { }
 
 variable "key_pair" { }
 
+variable "instance_type" { }
+
 variable "mysql_pass" { }
 
 variable "mysql_user" { }
@@ -17,3 +19,5 @@ variable "kms_key_id" { }
 variable "vault_dl_url" { }
 
 variable "vault_license" { }
+
+variable "prefix" { }

@@ -25,12 +25,12 @@ resource "aws_instance" "vault-server" {
     iam_instance_profile = "${aws_iam_instance_profile.vault-kms-unseal.id}"
     
     tags = {
-        Name = "vault-unseal-demo"
+        Name = "${var.prefix}-vault-unseal-demo"
     }
 }
 
 resource "aws_security_group" "vault-server-sg" {
-    name = "vault-server-sg"
+    name = "${var.prefix}-vault-server-sg"
     description = "webserver security group"
     vpc_id = "${data.aws_vpc.primary-vpc.id}"
 
@@ -97,17 +97,17 @@ data "aws_iam_policy_document" "vault-kms-unseal" {
 }
 
 resource "aws_iam_role" "vault-kms-unseal" {
-  name               = "vault-demo-kms-role-unseal"
+  name               = "${var.prefix}-vault-demo-kms-role-unseal"
   assume_role_policy = "${data.aws_iam_policy_document.assume_role.json}"
 }
 
 resource "aws_iam_role_policy" "vault-kms-unseal" {
-  name   = "vault-demo-kms-unseal"
+  name   = "${var.prefix}-vault-demo-kms-unseal"
   role   = "${aws_iam_role.vault-kms-unseal.id}"
   policy = "${data.aws_iam_policy_document.vault-kms-unseal.json}"
 }
 
 resource "aws_iam_instance_profile" "vault-kms-unseal" {
-  name = "vault-demo-kms-unseal"
+  name = "${var.prefix}-vault-demo-kms-unseal"
   role = "${aws_iam_role.vault-kms-unseal.name}"
 }
