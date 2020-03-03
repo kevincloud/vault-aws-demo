@@ -3,7 +3,7 @@ resource "aws_db_instance" "vault-mysql" {
     storage_type = "gp2"
     engine = "mysql"
     engine_version = "5.7"
-    instance_class = "db.t3.micro"
+    instance_class = "db.${var.instance_type}"
     identifier = var.mysql_dbname
     name = var.mysql_dbname
     vpc_security_group_ids = [aws_security_group.vault-mysql-sg.id]
