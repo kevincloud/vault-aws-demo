@@ -16,6 +16,7 @@ pip3 install awscli Flask mysql-connector-python hvac
 mkdir /etc/vault.d
 mkdir -p /opt/vault
 mkdir -p /root/.aws
+mkdir -p /var/run/vault
 
 sudo bash -c "cat >/root/.aws/config" << 'EOF'
 [default]
@@ -88,6 +89,7 @@ mkdir /root/unseal
 mkdir /root/database
 mkdir /root/ec2auth
 mkdir /root/eaas
+mkdir /root/pki
 
 # Auto unseal
 sudo bash -c "cat >/root/unseal/s1_reconfig.sh" <<EOF
@@ -261,6 +263,101 @@ sudo bash -c "cat >/root/eaas/app/run" <<EOT
 python3 app.py
 EOT
 chmod a+x /root/eaas/app/run
+
+# pki + consul-template
+curl -sfLo "consul-template.zip" "${CTPL_URL}"
+sudo unzip consul-template.zip -d /usr/local/bin/
+
+sudo bash -c "cat >/etc/vault.d/ct-config.hcl" <<EOT
+vault {
+  address = "http://localhost:8200"
+  token="$VAULT_TOKEN"
+  grace = "1s"
+  unwrap_token = false
+  renew_token = false
+}
+
+syslog {
+    enabled = true
+    facility = "LOCAL5"
+}
+
+reload_signal = "SIGHUP"
+kill_signal = "SIGINT"
+log_level = "debug"
+
+template {
+    contents="{{ with secret \"example_com_pki/issue/web-certs\" \"common_name=www.example.com\" }}{{ .Data.certificate }}{{ end }}"
+    destination="/root/pki/www.example.com.crt"
+    perms = 0400
+    command = "service nginx restart"
+}
+EOT
+
+echo "Installing systemd service for Consul Template..."
+sudo bash -c "cat >/etc/systemd/system/consul-template.service" <<EOT
+[Unit]
+Description=Hashicorp Consul Template
+Requires=network-online.target
+After=network-online.target
+
+[Service]
+User=root
+Group=root
+ExecStart=/usr/local/bin/consul-template -config=/etc/vault.d/ct-config.hcl -pid-file=/var/run/vault/consul-template.pid
+SuccessExitStatus=12
+ExecReload=/bin/kill -SIGHUP \$MAINPID
+ExecStop=/bin/kill -SIGINT \$MAINPID
+KillMode=process
+KillSignal=SIGTERM
+Restart=always
+RestartSec=42s
+LimitNOFILE=4096
+
+[Install]
+WantedBy=multi-user.target
+EOT
+
+sudo systemctl enable consul-template
+
+sudo bash -c "cat >/root/pki/s1_enable_pki.sh" <<EOT
+vault secrets enable -path=example_com_pki pki
+
+vault write -field=certificate \
+    example_com_pki/root/generate/internal \
+    common_name=example.com > /root/pki/ca_cert.crt
+EOT
+chmod a+x /root/pki/s1_enable_pki.sh
+
+sudo bash -c "cat >/root/pki/s2_create_role.sh" <<EOT
+vault write example_com_pki/roles/web-certs \
+    allowed_domains=example.com \
+    allow_subdomains=true \
+    ttl=5s \
+    max_ttl=30m \
+    generate_lease=true
+EOT
+chmod a+x /root/pki/s2_create_role.sh
+
+sudo bash -c "cat >/root/pki/s3_create_cert.sh" <<EOT
+vault write example_com_pki/issue/web-certs \
+    common_name=www.example.com
+
+curl \
+    --request POST \
+    --header "X-Vault-Token: $VAULT_TOKEN" \
+    --data '{"common_name": "www.example.com" }' \
+    http://localhost:8200/v1/pki/issue/web-certs | jq .data.certificate > www.example.com.crt
+
+EOT
+chmod a+x /root/pki/s3_create_cert.sh
+
+sudo bash -c "cat >/root/pki/s4_autoroll_cert.sh" <<EOT
+service consul-template start
+EOT
+chmod a+x /root/pki/s4_autoroll_cert.sh
+
+
 
 # echo "Setting up environment variables..."
 echo "export VAULT_ADDR=http://localhost:8200" >> /home/ubuntu/.profile

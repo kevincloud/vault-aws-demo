@@ -20,4 +20,6 @@ variable "vault_dl_url" { }
 
 variable "vault_license" { }
 
+variable "consul_tpl_url" { }
+
 variable "prefix" { }
