@@ -42,7 +42,7 @@ Using your favorite editor, edit the `/etc/vault.d/vault.hcl` file and add these
 
 ```hcl
 seal "awskms" {
-    region = "us-west-2"
+    region = "us-east-1"
     kms_key_id = "<KEYID>"
 }
 ```

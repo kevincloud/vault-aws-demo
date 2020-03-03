@@ -79,8 +79,6 @@ export DB_HOST=`echo '${MYSQL_HOST}' | awk -F ":" '/1/ {print $1}'`
 
 sleep 5
 
-vault write sys/license text=${VAULT_LICENSE}
-
 # Setup demos
 UNSEAL_KEY_1=`cat /root/init.txt | sed -n -e '/^Unseal Key 1/ s/.*\: *//p'`
 UNSEAL_KEY_2=`cat /root/init.txt | sed -n -e '/^Unseal Key 2/ s/.*\: *//p'`
@@ -96,7 +94,7 @@ sudo bash -c "cat >/root/unseal/s1_reconfig.sh" <<EOF
 cat >>/etc/vault.d/vault.hcl <<VAULTCFG
 
 seal "awskms" {
-    region = "us-west-2"
+    region = "${AWS_REGION}"
     kms_key_id = "${AWS_KMS_KEY_ID}"
 }
 VAULTCFG
@@ -127,6 +125,9 @@ fi
 vault operator rekey -target=recovery -key-shares=1 -key-threshold=1 -nonce=\$1 $UNSEAL_KEY_1
 vault operator rekey -target=recovery -key-shares=1 -key-threshold=1 -nonce=\$1 $UNSEAL_KEY_2
 vault operator rekey -target=recovery -key-shares=1 -key-threshold=1 -nonce=\$1 $UNSEAL_KEY_3
+
+vault write sys/license text=${VAULT_LICENSE}
+
 EOF
 chmod a+x /root/unseal/s4_unseal_rekey.sh
 

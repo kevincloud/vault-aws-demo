@@ -7,7 +7,7 @@ output "vault-login" {
 }
 
 output "mysql-host" {
-    value = "${aws_db_instance.vault-mysql.endpoint}"
+    value = aws_db_instance.vault-mysql.endpoint
 }
 
 output "ec2-allow-instance" {
