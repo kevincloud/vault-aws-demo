@@ -4,8 +4,8 @@ resource "aws_db_instance" "vault-mysql" {
     engine = "mysql"
     engine_version = "5.7"
     instance_class = "db.${var.instance_type}"
-    identifier = var.mysql_dbname
-    name = var.mysql_dbname
+    identifier = "${var.prefix}${var.mysql_dbname}"
+    name = "${var.prefix}${var.mysql_dbname}"
     vpc_security_group_ids = [aws_security_group.vault-mysql-sg.id]
     username = var.mysql_user
     password = var.mysql_pass
