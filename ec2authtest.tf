@@ -31,7 +31,7 @@ resource "aws_instance" "vault-ec2-allow" {
 }
 
 resource "aws_security_group" "vault-ec2-sg" {
-    name = "vault-ec2-sg"
+    name = "${var.prefix}-vault-ec2-sg"
     description = "ec2-vault security group"
     vpc_id = data.aws_vpc.primary-vpc.id
 

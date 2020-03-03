@@ -13,7 +13,7 @@ resource "aws_db_instance" "vault-mysql" {
 }
 
 resource "aws_security_group" "vault-mysql-sg" {
-    name = "vault-mysql-sg"
+    name = "${var.prefix}-vault-mysql-sg"
     description = "mysql security group"
     vpc_id = data.aws_vpc.primary-vpc.id
 
