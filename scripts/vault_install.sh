@@ -15,23 +15,23 @@ mkdir -p /opt/vault
 mkdir -p /root/.aws
 mkdir -p /var/run/vault
 
-sudo bash -c "cat >/root/.aws/config" << 'EOF'
+sudo bash -c "cat >/root/.aws/config" <<EOT
 [default]
 aws_access_key_id=${AWS_ACCESS_KEY}
 aws_secret_access_key=${AWS_SECRET_KEY}
-EOF
-sudo bash -c "cat >/root/.aws/credentials" << 'EOF'
+EOT
+sudo bash -c "cat >/root/.aws/credentials" <<EOT
 [default]
 aws_access_key_id=${AWS_ACCESS_KEY}
 aws_secret_access_key=${AWS_SECRET_KEY}
-EOF
+EOT
 
 echo "Installing Vault..."
 curl -sfLo "vault.zip" "${VAULT_URL}"
 sudo unzip vault.zip -d /usr/local/bin/
 
 # Server configuration
-sudo bash -c "cat >/etc/vault.d/vault.hcl" << 'EOF'
+sudo bash -c "cat >/etc/vault.d/vault.hcl" <<EOT
 storage "file" {
   path = "/opt/vault"
 }
@@ -42,11 +42,11 @@ listener "tcp" {
 }
 
 ui = true
-EOF
+EOT
 
 # Set Vault up as a systemd service
 echo "Installing systemd service for Vault..."
-sudo bash -c "cat >/etc/systemd/system/vault.service" << 'EOF'
+sudo bash -c "cat >/etc/systemd/system/vault.service" <<EOT
 [Unit]
 Description=Hashicorp Vault
 After=network.target
@@ -60,7 +60,7 @@ Restart=on-failure # or always, on-abort, etc
 
 [Install]
 WantedBy=multi-user.target
-EOF
+EOT
 
 sudo systemctl start vault
 sudo systemctl enable vault
@@ -69,7 +69,6 @@ sleep 5
 
 export VAULT_IP=`curl -s http://169.254.169.254/latest/meta-data/public-ipv4`
 export VAULT_ADDR=http://localhost:8200
-# vault operator init -recovery-shares=1 -recovery-threshold=1 -key-shares=1 -key-threshold=1 > /root/init.txt 2>&1
 vault operator init -recovery-shares=1 -recovery-threshold=1 > /root/init.txt 2>&1
 export VAULT_TOKEN=`cat /root/init.txt | sed -n -e '/^Initial Root Token/ s/.*\: *//p'`
 export DB_HOST=`echo '${MYSQL_HOST}' | awk -F ":" '/1/ {print $1}'`
@@ -87,7 +86,7 @@ mkdir /root/eaas
 mkdir /root/pki
 
 # Auto unseal
-sudo bash -c "cat >/root/unseal/s1_reconfig.sh" <<EOF
+sudo bash -c "cat >/root/unseal/s1_reconfig.sh" <<EOT
 cat >>/etc/vault.d/vault.hcl <<VAULTCFG
 
 seal "awskms" {
@@ -95,28 +94,28 @@ seal "awskms" {
     kms_key_id = "${AWS_KMS_KEY_ID}"
 }
 VAULTCFG
-EOF
+EOT
 chmod a+x /root/unseal/s1_reconfig.sh
 
-sudo bash -c "cat >/root/unseal/s2_unseal_migrate.sh" <<EOF
+sudo bash -c "cat >/root/unseal/s2_unseal_migrate.sh" <<EOT
 #!/bin/bash
 
 vault operator unseal -migrate $UNSEAL_KEY_1
 vault operator unseal -migrate $UNSEAL_KEY_2
 vault operator unseal -migrate $UNSEAL_KEY_3
-EOF
+EOT
 chmod a+x /root/unseal/s2_unseal_migrate.sh
 
-sudo bash -c "cat >/root/unseal/s3_unseal_migrate.sh" <<EOF
+sudo bash -c "cat >/root/unseal/s3_unseal_migrate.sh" <<EOT
 #!/bin/bash
 
-vault operator rekey -init -target=recovery -key-shares=1 -key-threshold=1 > /root/unseal/rekey.txt 2>&1
+vault operator rekey -init -target=recovery -key-shares=1 -key-threshold=1 > /root/unseal/rekey.txt
 
-export NONCE_KEY=`cat /root/unseal/rekey.txt | sed -n '/^Nonce/p' | awk -F " " '{print $2}'`
-EOF
+export NONCE_KEY=$(cat /root/unseal/rekey.txt | sed -n '/^Nonce/p' | awk -F " " '{print $2}')
+EOT
 chmod a+x /root/unseal/s3_unseal_migrate.sh
 
-sudo bash -c "cat >/root/unseal/s4_unseal_rekey.sh" <<EOF
+sudo bash -c "cat >/root/unseal/s4_unseal_rekey.sh" <<EOT
 #!/bin/bash
 vault operator rekey -target=recovery -key-shares=1 -key-threshold=1 -nonce=\$NONCE_KEY $UNSEAL_KEY_1
 vault operator rekey -target=recovery -key-shares=1 -key-threshold=1 -nonce=\$NONCE_KEY $UNSEAL_KEY_2
@@ -124,11 +123,11 @@ vault operator rekey -target=recovery -key-shares=1 -key-threshold=1 -nonce=\$NO
 
 vault write sys/license text=${VAULT_LICENSE}
 
-EOF
+EOT
 chmod a+x /root/unseal/s4_unseal_rekey.sh
 
 # Dynamic creds
-sudo bash -c "cat >/root/database/s1_setup_db.sh" << 'EOF'
+sudo bash -c "cat >/root/database/s1_setup_db.sh" <<EOT
 vault secrets enable database
 
 vault write database/config/sedemovaultdb \
@@ -144,10 +143,10 @@ vault write database/roles/app-role \
     default_ttl="1h" \
     max_ttl="24h"
 
-EOF
+EOT
 chmod a+x /root/database/s1_setup_db.sh
 
-sudo bash -c "cat >/root/database/operators.hcl" << 'EOT'
+sudo bash -c "cat >/root/database/operators.hcl" <<EOT
 path "database/roles/*" {
     capabilities = ["read", "list", "create", "delete", "update"]
 }
@@ -161,19 +160,19 @@ path "secret/*" {
 }
 EOT
 
-sudo bash -c "cat >/root/database/appdevs.hcl" << 'EOT'
+sudo bash -c "cat >/root/database/appdevs.hcl" <<EOT
 path "secret/*" {
     capabilities = ["read", "list"]
 }
 EOT
 
-sudo bash -c "cat >/root/database/s2_policies.sh" << 'EOT'
+sudo bash -c "cat >/root/database/s2_policies.sh" <<EOT
 vault policy write operators /root/database/operators.hcl
 vault policy write appdevs /root/database/appdevs.hcl
 EOT
 chmod a+x /root/database/s2_policies.sh
 
-sudo bash -c "cat >/root/database/s3_users.sh" << 'EOT'
+sudo bash -c "cat >/root/database/s3_users.sh" <<EOT
 vault auth enable userpass
 vault write auth/userpass/users/james \
     password="superpass" \
@@ -187,7 +186,7 @@ chmod a+x /root/database/s3_users.sh
 
 # ec2 auth
 
-sudo bash -c "cat >/root/ec2auth/s1_setup_auth.sh" << 'EOT'
+sudo bash -c "cat >/root/ec2auth/s1_setup_auth.sh" <<EOT
 vault auth enable aws
 
 vault write auth/aws/config/client \
