@@ -114,7 +114,7 @@ sudo bash -c "cat >/root/unseal/s3_unseal_migrate.sh" <<EOT
 
 vault operator rekey -init -target=recovery -key-shares=1 -key-threshold=1 > /root/unseal/rekey.txt
 
-export NONCE_KEY=\$(cat /root/unseal/rekey.txt | sed -n '/^Nonce/p' | awk -F " " '{print $2}')
+export NONCE_KEY=\$(cat /root/unseal/rekey.txt | sed -n '/^Nonce/p' | awk -F " " '{print \$2}')
 EOT
 chmod a+x /root/unseal/s3_unseal_migrate.sh
 
@@ -350,7 +350,15 @@ service consul-template start
 EOT
 chmod a+x /root/pki/s4_autoroll_cert.sh
 
+sudo bash -c "cat >/root/pki/s5_monitor.sh" <<EOT
+#!/bin/bash
 
+while [ 1 ]; do
+    more /root/pki/www.example.com.crt
+    sleep 1
+done
+EOT
+chmod a+x /root/pki/s5_monitor.sh
 
 # echo "Setting up environment variables..."
 echo "export VAULT_ADDR=http://localhost:8200" >> /home/ubuntu/.profile
