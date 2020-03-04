@@ -94,6 +94,9 @@ seal "awskms" {
     kms_key_id = "${AWS_KMS_KEY_ID}"
 }
 VAULTCFG
+
+sleep 5
+service vault restart
 EOT
 chmod a+x /root/unseal/s1_reconfig.sh
 
@@ -111,7 +114,7 @@ sudo bash -c "cat >/root/unseal/s3_unseal_migrate.sh" <<EOT
 
 vault operator rekey -init -target=recovery -key-shares=1 -key-threshold=1 > /root/unseal/rekey.txt
 
-export NONCE_KEY=$(cat /root/unseal/rekey.txt | sed -n '/^Nonce/p' | awk -F " " '{print $2}')
+export NONCE_KEY=\$(cat /root/unseal/rekey.txt | sed -n '/^Nonce/p' | awk -F " " '{print $2}')
 EOT
 chmod a+x /root/unseal/s3_unseal_migrate.sh
 
@@ -130,17 +133,17 @@ chmod a+x /root/unseal/s4_unseal_rekey.sh
 sudo bash -c "cat >/root/database/s1_setup_db.sh" <<EOT
 vault secrets enable database
 
-vault write database/config/sedemovaultdb \
-    plugin_name="mysql-database-plugin" \
-    connection_url="{{username}}:{{password}}@tcp(${MYSQL_HOST})/" \
-    allowed_roles="app-role" \
-    username="${MYSQL_USER}" \
+vault write database/config/sedemovaultdb \\
+    plugin_name="mysql-database-plugin" \\
+    connection_url="{{username}}:{{password}}@tcp(${MYSQL_HOST})/" \\
+    allowed_roles="app-role" \\
+    username="${MYSQL_USER}" \\
     password="${MYSQL_PASS}"
 
-vault write database/roles/app-role \
-    db_name=sedemovaultdb \
-    creation_statements="CREATE USER '{{name}}'@'%' IDENTIFIED BY '{{password}}';GRANT SELECT ON *.* TO '{{name}}'@'%';" \
-    default_ttl="1h" \
+vault write database/roles/app-role \\
+    db_name=sedemovaultdb \\
+    creation_statements="CREATE USER '{{name}}'@'%' IDENTIFIED BY '{{password}}';GRANT SELECT ON *.* TO '{{name}}'@'%';" \\
+    default_ttl="1h" \\
     max_ttl="24h"
 
 EOT
@@ -174,12 +177,12 @@ chmod a+x /root/database/s2_policies.sh
 
 sudo bash -c "cat >/root/database/s3_users.sh" <<EOT
 vault auth enable userpass
-vault write auth/userpass/users/james \
-    password="superpass" \
+vault write auth/userpass/users/james \\
+    password="superpass" \\
     policies="operators"
 
-vault write auth/userpass/users/sally \
-    password="superpass" \
+vault write auth/userpass/users/sally \\
+    password="superpass" \\
     policies="appdevs"
 EOT
 chmod a+x /root/database/s3_users.sh
@@ -189,8 +192,8 @@ chmod a+x /root/database/s3_users.sh
 sudo bash -c "cat >/root/ec2auth/s1_setup_auth.sh" <<EOT
 vault auth enable aws
 
-vault write auth/aws/config/client \
-    secret_key=${AWS_SECRET_KEY} \
+vault write auth/aws/config/client \\
+    secret_key=${AWS_SECRET_KEY} \\
     access_key=${AWS_ACCESS_KEY}
 
 vault policy write "db-policy" -<<EOF
@@ -199,12 +202,12 @@ path "database/creds/app-role" {
 }
 EOF
 
-vault write \
-    auth/aws/role/app-db-role \
-    auth_type=ec2 \
-    policies=db-policy \
-    max_ttl=1h \
-    disallow_reauthentication=false \
+vault write \\
+    auth/aws/role/app-db-role \\
+    auth_type=ec2 \\
+    policies=db-policy \\
+    max_ttl=1h \\
+    disallow_reauthentication=false \\
     bound_ami_id=${AMI_ID}
 EOT
 chmod a+x /root/ec2auth/s1_setup_auth.sh
@@ -313,30 +316,30 @@ sudo systemctl enable consul-template
 sudo bash -c "cat >/root/pki/s1_enable_pki.sh" <<EOT
 vault secrets enable -path=example_com_pki pki
 
-vault write -field=certificate \
-    example_com_pki/root/generate/internal \
+vault write -field=certificate \\
+    example_com_pki/root/generate/internal \\
     common_name=example.com > /root/pki/ca_cert.crt
 EOT
 chmod a+x /root/pki/s1_enable_pki.sh
 
 sudo bash -c "cat >/root/pki/s2_create_role.sh" <<EOT
-vault write example_com_pki/roles/web-certs \
-    allowed_domains=example.com \
-    allow_subdomains=true \
-    ttl=5s \
-    max_ttl=30m \
+vault write example_com_pki/roles/web-certs \\
+    allowed_domains=example.com \\
+    allow_subdomains=true \\
+    ttl=5s \\
+    max_ttl=30m \\
     generate_lease=true
 EOT
 chmod a+x /root/pki/s2_create_role.sh
 
 sudo bash -c "cat >/root/pki/s3_create_cert.sh" <<EOT
-vault write example_com_pki/issue/web-certs \
+vault write example_com_pki/issue/web-certs \\
     common_name=www.example.com
 
-curl \
-    --request POST \
-    --header "X-Vault-Token: $VAULT_TOKEN" \
-    --data '{"common_name": "www.example.com" }' \
+curl \\
+    --request POST \\
+    --header "X-Vault-Token: $VAULT_TOKEN" \\
+    --data '{"common_name": "www.example.com" }' \\
     http://localhost:8200/v1/example_com_pki/issue/web-certs | jq -r .data.certificate > www.example.com.crt
 
 EOT
