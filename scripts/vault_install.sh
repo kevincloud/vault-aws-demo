@@ -272,9 +272,7 @@ sudo unzip consul-template.zip -d /usr/local/bin/
 sudo bash -c "cat >/etc/vault.d/ct-config.hcl" <<EOT
 vault {
   address = "http://localhost:8200"
-  token="$VAULT_TOKEN"
-  grace = "1s"
-  unwrap_token = false
+  token = "$VAULT_TOKEN"
   renew_token = false
 }
 
@@ -283,15 +281,11 @@ syslog {
     facility = "LOCAL5"
 }
 
-reload_signal = "SIGHUP"
-kill_signal = "SIGINT"
-log_level = "debug"
-
 template {
     contents="{{ with secret \"example_com_pki/issue/web-certs\" \"common_name=www.example.com\" }}{{ .Data.certificate }}{{ end }}"
     destination="/root/pki/www.example.com.crt"
     perms = 0400
-    command = "service nginx restart"
+    # command = "service nginx restart"
 }
 EOT
 
@@ -348,7 +342,7 @@ curl \
     --request POST \
     --header "X-Vault-Token: $VAULT_TOKEN" \
     --data '{"common_name": "www.example.com" }' \
-    http://localhost:8200/v1/pki/issue/web-certs | jq .data.certificate > www.example.com.crt
+    http://localhost:8200/v1/example_com_pki/issue/web-certs | jq -r .data.certificate > www.example.com.crt
 
 EOT
 chmod a+x /root/pki/s3_create_cert.sh
