@@ -4,9 +4,6 @@
 echo "Preparing to install Vault..."
 echo 'libc6 libraries/restart-without-asking boolean true' | sudo debconf-set-selections
 export DEBIAN_FRONTEND=noninteractive
-apt-get -y remove grub-pc
-apt-get -y install grub-pc
-update-grub
 sudo apt-get -y update > /dev/null 2>&1
 sudo apt-get -y upgrade > /dev/null 2>&1
 sudo apt-get install -y unzip jq cowsay mysql-client > /dev/null 2>&1
@@ -113,18 +110,17 @@ chmod a+x /root/unseal/s2_unseal_migrate.sh
 sudo bash -c "cat >/root/unseal/s3_unseal_migrate.sh" <<EOF
 #!/bin/bash
 
-vault operator rekey -init -target=recovery -key-shares=1 -key-threshold=1
+vault operator rekey -init -target=recovery -key-shares=1 -key-threshold=1 > /root/unseal/rekey.txt 2>&1
+
+export NONCE_KEY=`cat /root/unseal/rekey.txt | sed -n '/^Nonce/p' | awk -F " " '{print $2}'`
 EOF
 chmod a+x /root/unseal/s3_unseal_migrate.sh
 
 sudo bash -c "cat >/root/unseal/s4_unseal_rekey.sh" <<EOF
 #!/bin/bash
-if [ -z "\$1" ]; then
-  exit 1
-fi
-vault operator rekey -target=recovery -key-shares=1 -key-threshold=1 -nonce=\$1 $UNSEAL_KEY_1
-vault operator rekey -target=recovery -key-shares=1 -key-threshold=1 -nonce=\$1 $UNSEAL_KEY_2
-vault operator rekey -target=recovery -key-shares=1 -key-threshold=1 -nonce=\$1 $UNSEAL_KEY_3
+vault operator rekey -target=recovery -key-shares=1 -key-threshold=1 -nonce=\$NONCE_KEY $UNSEAL_KEY_1
+vault operator rekey -target=recovery -key-shares=1 -key-threshold=1 -nonce=\$NONCE_KEY $UNSEAL_KEY_2
+vault operator rekey -target=recovery -key-shares=1 -key-threshold=1 -nonce=\$NONCE_KEY $UNSEAL_KEY_3
 
 vault write sys/license text=${VAULT_LICENSE}
 
