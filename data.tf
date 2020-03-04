@@ -28,7 +28,7 @@ data "aws_ami" "ubuntu2" {
 
     filter {
         name = "name"
-        values = ["ubuntu/images/hvm-ssd/ubuntu-cosmic-18.10-*"]
+        values = ["ubuntu/images/hvm-ssd/ubuntu-eoan-19.10-*"]
     }
 
     filter {
