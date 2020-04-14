@@ -1,8 +1,9 @@
 #!/bin/bash
 
 # pki + consul-template
-curl -sfLo "/root/consul-template.zip" "${CTPL_URL}"
-sudo unzip /root/consul-template.zip -d /usr/local/bin/
+curl -sfLo "consul-template.zip" "${CTPL_URL}"
+sudo unzip consul-template.zip -d /usr/local/bin/
+rm consul-template.zip
 
 sudo bash -c "cat >/etc/vault.d/ct-config.hcl" <<EOT
 vault {
@@ -124,7 +125,7 @@ read -n1 kbd
 # vault write example_com_pki/issue/web-certs \\
 #     common_name=www.example.com
 
-curl \\
+curl -s \\
     --request POST \\
     --header "X-Vault-Token: $VAULT_TOKEN" \\
     --data '{"common_name": "www.example.com" }' \\

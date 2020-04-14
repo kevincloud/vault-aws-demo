@@ -28,7 +28,8 @@ vault secrets enable -path=lob_a/workshop/transit transit > /dev/null
 # Create our customer key
 vault write -f lob_a/workshop/transit/keys/customer-key > /dev/null
 
-/root/eaas/app/run
+cd /root/eaas/app
+./run
 echo "http://$VAULT_IP:5000/"
 EOT
 chmod a+x /root/eaas/s1_enable_transit.sh
@@ -115,7 +116,8 @@ mv /root/eaas/app/config.ini /root/eaas/app/config-z.ini
 
 mv /root/eaas/app/config-x.ini /root/eaas/app/config.ini
 
-/root/eaas/app/run
+cd /root/eaas/app
+./run
 echo "http://$VAULT_IP:5000/"
 EOT
 chmod a+x /root/eaas/s2_reconfig_transit.sh
