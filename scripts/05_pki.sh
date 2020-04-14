@@ -156,7 +156,8 @@ sudo bash -c "cat >/root/pki/s5_monitor.sh" <<EOT
 #!/bin/bash
 
 while [ 1 ]; do
-    more /root/pki/www.example.com.crt
+    clear
+    cat /root/pki/www.example.com.crt
     sleep 1
 done
 EOT
