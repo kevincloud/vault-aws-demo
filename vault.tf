@@ -15,6 +15,7 @@ data "template_file" "vault_setup" {
         VAULT_URL = var.vault_dl_url
         VAULT_LICENSE = var.vault_license
         CTPL_URL = var.consul_tpl_url
+        GIT_BRANCH = var.git_branch
     }
 }
 

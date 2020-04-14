@@ -98,7 +98,7 @@ mkdir /root/eaas
 mkdir /root/pki
 
 cd /root
-git clone https://github.com/kevincloud/vault-aws-demo.git
+git clone --single-branch --branch ${GIT_BRANCH} https://github.com/kevincloud/vault-aws-demo.git
 
 . /root/vault-aws-demo/scripts/01_unseal.sh
 . /root/vault-aws-demo/scripts/02_database.sh
