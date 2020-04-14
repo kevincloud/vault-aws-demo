@@ -15,7 +15,7 @@ cat <<DESCRIPTION
 Our application can login without needing to pass secrets.
 
 # Get instance signature
-pkcs7=\$(curl -s \\
+pkcs7=\$(curl -s \\\\
   "http://169.254.169.254/latest/dynamic/instance-identity/pkcs7" | tr -d '\n')
 
 # Create data payload
@@ -28,8 +28,8 @@ EOF
 )
 
 # Login and retrieve client token
-curl --request POST \\
-  --data "\$data" \\
+curl --request POST \\\\
+  --data "\$data" \\\\
   "http://${VAULT_IP}:8200/v1/auth/aws/login"
 
 Press any key to continue...
@@ -69,8 +69,8 @@ cat <<DESCRIPTION
 Once we've logged in an have received a token, we can access 
 the secrets associated with the role we've logged in with.
 
-curl -s \\
-    --header "X-Vault-Token: \$CLIENT_TOKEN" \\
+curl -s \\\\
+    --header "X-Vault-Token: \$CLIENT_TOKEN" \\\\
     http://${VAULT_IP}:8200/v1/database/creds/app-role | jq 
 
 Press any key to continue...

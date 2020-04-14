@@ -10,17 +10,17 @@ with a CREATE USER / GRANT statement.
 
 vault secrets enable database
 
-vault write database/config/sedemovaultdb \\
-    plugin_name="mysql-database-plugin" \\
-    connection_url="{{username}}:{{password}}@tcp(${MYSQL_HOST})/" \\
-    allowed_roles="app-role" \\
-    username="XXXXXXXX" \\
+vault write database/config/sedemovaultdb \\\\
+    plugin_name="mysql-database-plugin" \\\\
+    connection_url="{{username}}:{{password}}@tcp(${MYSQL_HOST})/" \\\\
+    allowed_roles="app-role" \\\\
+    username="XXXXXXXX" \\\\
     password="XXXXXXXX"
 
-vault write database/roles/app-role \\
-    db_name=sedemovaultdb \\
-    creation_statements="CREATE USER '{{name}}'@'%' IDENTIFIED BY '{{password}}';GRANT SELECT ON *.* TO '{{name}}'@'%';" \\
-    default_ttl="1h" \\
+vault write database/roles/app-role \\\\
+    db_name=sedemovaultdb \\\\
+    creation_statements="CREATE USER '{{name}}'@'%' IDENTIFIED BY '{{password}}';GRANT SELECT ON *.* TO '{{name}}'@'%';" \\\\
+    default_ttl="1h" \\\\
     max_ttl="24h"
 
 Press any key to continue...
@@ -28,7 +28,7 @@ DESCRIPTION
 
 read -n1 kbd
 
-vault secrets enable database
+vault secrets enable database > /dev/null
 
 vault write database/config/sedemovaultdb \\
     plugin_name="mysql-database-plugin" \\
@@ -43,6 +43,7 @@ vault write database/roles/app-role \\
     default_ttl="1h" \\
     max_ttl="24h" > /dev/null
 
+echo "Configuration complete!"
 EOT
 chmod a+x /root/database/s1_setup_db.sh
 
@@ -96,6 +97,7 @@ read -n1 kbd
 
 vault policy write operators /root/database/operators.hcl > /dev/null
 vault policy write appdevs /root/database/appdevs.hcl > /dev/null
+echo "Policies added!"
 EOT
 chmod a+x /root/database/s2_policies.sh
 
@@ -107,12 +109,12 @@ a couple of users and assign the new policies to them.
 
 vault auth enable userpass
 
-vault write auth/userpass/users/james \\
-    password="superpass" \\
+vault write auth/userpass/users/james \\\\
+    password="superpass" \\\\
     policies="operators"
 
-vault write auth/userpass/users/sally \\
-    password="superpass" \\
+vault write auth/userpass/users/sally \\\\
+    password="superpass" \\\\
     policies="appdevs"
 
 Press any key to continue...
@@ -128,6 +130,8 @@ vault write auth/userpass/users/james \\
 vault write auth/userpass/users/sally \\
     password="superpass" \\
     policies="appdevs" > /dev/null
+
+echo "Users added!"
 EOT
 chmod a+x /root/database/s3_users.sh
 

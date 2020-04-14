@@ -59,8 +59,8 @@ create our root cert for example.com
 
 vault secrets enable -path=example_com_pki pki
 
-vault write -field=certificate \\
-    example_com_pki/root/generate/internal \\
+vault write -field=certificate \\\\
+    example_com_pki/root/generate/internal \\\\
     common_name=example.com > /root/pki/ca_cert.crt
 
 Press any key to continue...
@@ -83,11 +83,11 @@ Next, we'll create a role which sets the lease times
 and other attributes for certificate generation and 
 signing.
 
-vault write example_com_pki/roles/web-certs \\
-    allowed_domains=example.com \\
-    allow_subdomains=true \\
-    ttl=5s \\
-    max_ttl=30m \\
+vault write example_com_pki/roles/web-certs \\\\
+    allowed_domains=example.com \\\\
+    allow_subdomains=true \\\\
+    ttl=5s \\\\
+    max_ttl=30m \\\\
     generate_lease=true
 
 Press any key to continue...
@@ -110,10 +110,10 @@ cat <<DESCRIPTION
 Now we can create our first certificate. We'll do this using 
 Vault's HTTP API.
 
-curl \\
-    --request POST \\
-    --header "X-Vault-Token: $VAULT_TOKEN" \\
-    --data '{"common_name": "www.example.com" }' \\
+curl -s \\\\
+    --request POST \\\\
+    --header "X-Vault-Token: $VAULT_TOKEN" \\\\
+    --data '{"common_name": "www.example.com" }' \\\\
     http://localhost:8200/v1/example_com_pki/issue/web-certs | jq -r .data.certificate > www.example.com.crt
 
 Press any key to continue...

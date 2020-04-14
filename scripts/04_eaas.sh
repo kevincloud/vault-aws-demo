@@ -82,7 +82,7 @@ rm -r /root/eaas/transit-app-example
 sudo bash -c "cat >/root/eaas/app/run" <<EOT
 #!/bin/bash
 
-python3 app.py > /root/eaas/app/log.txt &
+python3 /root/eaas/app/app.py > /root/eaas/app/log.txt &
 EOT
 chmod a+x /root/eaas/app/run
 
@@ -111,9 +111,9 @@ read -n1 kbd
 
 pkill python3
 
-mv /root/eaas/transit-app-example/backend/config.ini /root/eaas/transit-app-example/backend/config-z.ini
+mv /root/eaas/app/config.ini /root/eaas/app/config-z.ini
 
-mv /root/eaas/transit-app-example/backend/config-x.ini /root/eaas/transit-app-example/backend/config.ini
+mv /root/eaas/app/config-x.ini /root/eaas/app/config.ini
 
 /root/eaas/app/run
 echo "http://$VAULT_IP:5000/"
