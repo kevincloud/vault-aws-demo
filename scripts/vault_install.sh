@@ -73,6 +73,18 @@ vault operator init -recovery-shares=1 -recovery-threshold=1 > /root/init.txt 2>
 export VAULT_TOKEN=`cat /root/init.txt | sed -n -e '/^Initial Root Token/ s/.*\: *//p'`
 export DB_HOST=`echo '${MYSQL_HOST}' | awk -F ":" '/1/ {print $1}'`
 
+export AWS_ACCESS_KEY=${AWS_ACCESS_KEY}
+export AWS_SECRET_KEY=${AWS_SECRET_KEY}
+export AMI_ID=${AMI_ID}
+export AWS_REGION=${AWS_REGION}
+export MYSQL_HOST=${MYSQL_HOST}
+export MYSQL_USER=${MYSQL_USER}
+export MYSQL_PASS=${MYSQL_PASS}
+export AWS_KMS_KEY_ID=${AWS_KMS_KEY_ID}
+export VAULT_URL=${VAULT_URL}
+export VAULT_LICENSE=${VAULT_LICENSE}
+export CTPL_URL=${CTPL_URL}
+
 sleep 5
 
 # Setup demos
@@ -85,280 +97,14 @@ mkdir /root/ec2auth
 mkdir /root/eaas
 mkdir /root/pki
 
-# Auto unseal
-sudo bash -c "cat >/root/unseal/s1_reconfig.sh" <<EOT
-cat >>/etc/vault.d/vault.hcl <<VAULTCFG
+cd /root
+git clone https://github.com/kevincloud/vault-aws-demo.git
 
-seal "awskms" {
-    region = "${AWS_REGION}"
-    kms_key_id = "${AWS_KMS_KEY_ID}"
-}
-VAULTCFG
-
-sleep 5
-service vault restart
-EOT
-chmod a+x /root/unseal/s1_reconfig.sh
-
-sudo bash -c "cat >/root/unseal/s2_unseal_migrate.sh" <<EOT
-#!/bin/bash
-
-vault operator unseal -migrate $UNSEAL_KEY_1
-vault operator unseal -migrate $UNSEAL_KEY_2
-vault operator unseal -migrate $UNSEAL_KEY_3
-EOT
-chmod a+x /root/unseal/s2_unseal_migrate.sh
-
-sudo bash -c "cat >/root/unseal/s3_unseal_migrate.sh" <<EOT
-#!/bin/bash
-
-vault operator rekey -init -target=recovery -key-shares=1 -key-threshold=1 > /root/unseal/rekey.txt
-
-export NONCE_KEY=\$(cat /root/unseal/rekey.txt | sed -n '/^Nonce/p' | awk -F " " '{print \$2}')
-EOT
-chmod a+x /root/unseal/s3_unseal_migrate.sh
-
-sudo bash -c "cat >/root/unseal/s4_unseal_rekey.sh" <<EOT
-#!/bin/bash
-vault operator rekey -target=recovery -key-shares=1 -key-threshold=1 -nonce=\$NONCE_KEY $UNSEAL_KEY_1
-vault operator rekey -target=recovery -key-shares=1 -key-threshold=1 -nonce=\$NONCE_KEY $UNSEAL_KEY_2
-vault operator rekey -target=recovery -key-shares=1 -key-threshold=1 -nonce=\$NONCE_KEY $UNSEAL_KEY_3
-
-vault write sys/license text=${VAULT_LICENSE}
-
-EOT
-chmod a+x /root/unseal/s4_unseal_rekey.sh
-
-# Dynamic creds
-sudo bash -c "cat >/root/database/s1_setup_db.sh" <<EOT
-vault secrets enable database
-
-vault write database/config/sedemovaultdb \\
-    plugin_name="mysql-database-plugin" \\
-    connection_url="{{username}}:{{password}}@tcp(${MYSQL_HOST})/" \\
-    allowed_roles="app-role" \\
-    username="${MYSQL_USER}" \\
-    password="${MYSQL_PASS}"
-
-vault write database/roles/app-role \\
-    db_name=sedemovaultdb \\
-    creation_statements="CREATE USER '{{name}}'@'%' IDENTIFIED BY '{{password}}';GRANT SELECT ON *.* TO '{{name}}'@'%';" \\
-    default_ttl="1h" \\
-    max_ttl="24h"
-
-EOT
-chmod a+x /root/database/s1_setup_db.sh
-
-sudo bash -c "cat >/root/database/operators.hcl" <<EOT
-path "database/roles/*" {
-    capabilities = ["read", "list", "create", "delete", "update"]
-}
-
-path "database/creds/*" {
-    capabilities = ["read", "list", "create", "delete", "update"]
-}
-
-path "secret/*" {
-    capabilities = ["read", "list", "create", "delete", "update"]
-}
-EOT
-
-sudo bash -c "cat >/root/database/appdevs.hcl" <<EOT
-path "secret/*" {
-    capabilities = ["read", "list"]
-}
-EOT
-
-sudo bash -c "cat >/root/database/s2_policies.sh" <<EOT
-vault policy write operators /root/database/operators.hcl
-vault policy write appdevs /root/database/appdevs.hcl
-EOT
-chmod a+x /root/database/s2_policies.sh
-
-sudo bash -c "cat >/root/database/s3_users.sh" <<EOT
-vault auth enable userpass
-vault write auth/userpass/users/james \\
-    password="superpass" \\
-    policies="operators"
-
-vault write auth/userpass/users/sally \\
-    password="superpass" \\
-    policies="appdevs"
-EOT
-chmod a+x /root/database/s3_users.sh
-
-# ec2 auth
-
-sudo bash -c "cat >/root/ec2auth/s1_setup_auth.sh" <<EOT
-vault auth enable aws
-
-vault write auth/aws/config/client \\
-    secret_key=${AWS_SECRET_KEY} \\
-    access_key=${AWS_ACCESS_KEY}
-
-vault policy write "db-policy" -<<EOF
-path "database/creds/app-role" {
-    capabilities = ["list", "read"]
-}
-EOF
-
-vault write \\
-    auth/aws/role/app-db-role \\
-    auth_type=ec2 \\
-    policies=db-policy \\
-    max_ttl=1h \\
-    disallow_reauthentication=false \\
-    bound_ami_id=${AMI_ID}
-EOT
-chmod a+x /root/ec2auth/s1_setup_auth.sh
-
-# encryption as a service
-cd /root/eaas
-git clone https://github.com/norhe/transit-app-example.git
-
-sudo bash -c "cat >/root/eaas/s1_enable_transit.sh" <<EOT
-# Enable Logging
-vault audit enable file file_path=/var/log/vault_audit.log
-
-# Enable the secret engine
-vault secrets enable -path=lob_a/workshop/transit transit
-
-# Create our customer key
-vault write -f lob_a/workshop/transit/keys/customer-key
-
-# Create our archive key to demonstrate multiple keys
-vault write -f lob_a/workshop/transit/keys/archive-key
-EOT
-chmod a+x /root/eaas/s1_enable_transit.sh
-
-sudo bash -c "cat >/root/eaas/transit-app-example/backend/config.ini" <<EOT
-[DEFAULT]
-LogLevel = WARN
-
-[DATABASE]
-Address=$DB_HOST
-Port=3306
-User=${MYSQL_USER}
-Password=${MYSQL_PASS}
-Database=my_app
-
-[VAULT]
-Enabled=False
-DynamicDBCreds=False
-ProtectRecords=False
-Address=http://localhost:8200
-Token=$VAULT_TOKEN
-KeyPath=lob_a/workshop/transit
-KeyName=customer-key
-EOT
-
-mkdir /root/eaas/app
-mv /root/eaas/transit-app-example/backend/* /root/eaas/app
-rm -r /root/eaas/transit-app-example
-
-sudo bash -c "cat >/root/eaas/app/run" <<EOT
-#!/bin/bash
-
-python3 app.py
-EOT
-chmod a+x /root/eaas/app/run
-
-# pki + consul-template
-curl -sfLo "consul-template.zip" "${CTPL_URL}"
-sudo unzip consul-template.zip -d /usr/local/bin/
-
-sudo bash -c "cat >/etc/vault.d/ct-config.hcl" <<EOT
-vault {
-  address = "http://localhost:8200"
-  token = "$VAULT_TOKEN"
-  renew_token = false
-}
-
-syslog {
-    enabled = true
-    facility = "LOCAL5"
-}
-
-template {
-    contents="{{ with secret \"example_com_pki/issue/web-certs\" \"common_name=www.example.com\" }}{{ .Data.certificate }}{{ end }}"
-    destination="/root/pki/www.example.com.crt"
-    perms = 0400
-    # command = "service nginx restart"
-}
-EOT
-
-echo "Installing systemd service for Consul Template..."
-sudo bash -c "cat >/etc/systemd/system/consul-template.service" <<EOT
-[Unit]
-Description=Hashicorp Consul Template
-Requires=network-online.target
-After=network-online.target
-
-[Service]
-User=root
-Group=root
-ExecStart=/usr/local/bin/consul-template -config=/etc/vault.d/ct-config.hcl -pid-file=/var/run/vault/consul-template.pid
-SuccessExitStatus=12
-ExecReload=/bin/kill -SIGHUP \$MAINPID
-ExecStop=/bin/kill -SIGINT \$MAINPID
-KillMode=process
-KillSignal=SIGTERM
-Restart=always
-RestartSec=42s
-LimitNOFILE=4096
-
-[Install]
-WantedBy=multi-user.target
-EOT
-
-sudo systemctl enable consul-template
-
-sudo bash -c "cat >/root/pki/s1_enable_pki.sh" <<EOT
-vault secrets enable -path=example_com_pki pki
-
-vault write -field=certificate \\
-    example_com_pki/root/generate/internal \\
-    common_name=example.com > /root/pki/ca_cert.crt
-EOT
-chmod a+x /root/pki/s1_enable_pki.sh
-
-sudo bash -c "cat >/root/pki/s2_create_role.sh" <<EOT
-vault write example_com_pki/roles/web-certs \\
-    allowed_domains=example.com \\
-    allow_subdomains=true \\
-    ttl=5s \\
-    max_ttl=30m \\
-    generate_lease=true
-EOT
-chmod a+x /root/pki/s2_create_role.sh
-
-sudo bash -c "cat >/root/pki/s3_create_cert.sh" <<EOT
-vault write example_com_pki/issue/web-certs \\
-    common_name=www.example.com
-
-curl \\
-    --request POST \\
-    --header "X-Vault-Token: $VAULT_TOKEN" \\
-    --data '{"common_name": "www.example.com" }' \\
-    http://localhost:8200/v1/example_com_pki/issue/web-certs | jq -r .data.certificate > www.example.com.crt
-
-EOT
-chmod a+x /root/pki/s3_create_cert.sh
-
-sudo bash -c "cat >/root/pki/s4_autoroll_cert.sh" <<EOT
-service consul-template start
-EOT
-chmod a+x /root/pki/s4_autoroll_cert.sh
-
-sudo bash -c "cat >/root/pki/s5_monitor.sh" <<EOT
-#!/bin/bash
-
-while [ 1 ]; do
-    more /root/pki/www.example.com.crt
-    sleep 1
-done
-EOT
-chmod a+x /root/pki/s5_monitor.sh
+. /root/vault-aws-demo/scripts/01_unseal.sh
+. /root/vault-aws-demo/scripts/02_database.sh
+. /root/vault-aws-demo/scripts/03_ec2auth.sh
+. /root/vault-aws-demo/scripts/04_eaas.sh
+. /root/vault-aws-demo/scripts/05_pki.sh
 
 # echo "Setting up environment variables..."
 echo "export VAULT_ADDR=http://localhost:8200" >> /home/ubuntu/.profile
@@ -371,6 +117,7 @@ vault operator unseal $UNSEAL_KEY_2
 vault operator unseal $UNSEAL_KEY_3
 vault login $VAULT_TOKEN
 vault secrets enable -path="secret" -version=2 kv
+vault audit enable file file_path=/var/log/vault_audit.log
 
 # Add our AWS secrets
 curl \
