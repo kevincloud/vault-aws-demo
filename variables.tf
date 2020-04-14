@@ -23,3 +23,5 @@ variable "vault_license" { }
 variable "consul_tpl_url" { }
 
 variable "prefix" { }
+
+variable "git_branch" { }

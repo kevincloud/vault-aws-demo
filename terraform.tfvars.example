@@ -13,3 +13,4 @@ vault_dl_url = "https://releases.hashicorp.com/vault/1.3.2/vault_1.3.2_linux_amd
 vault_license = ""
 consul_tpl_url = "https://releases.hashicorp.com/consul-template/0.24.1/consul-template_0.24.1_linux_arm64.zip"
 prefix = "mycoolprefix"
+git_branch = "master"
