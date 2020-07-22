@@ -168,7 +168,7 @@ vault status
 EOT
 chmod a+x /root/unseal/s4_unseal_rekey.sh
 
-sudo bash -c "cat >/root/unseal/s4_unseal_rekey.sh" <<EOT
+sudo bash -c "cat >/root/unseal/s99_batch_configure.sh" <<EOT
 echo "Configuring auto unseal..."
 cat >>/etc/vault.d/vault.hcl <<VAULTCFG
 
