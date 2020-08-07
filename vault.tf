@@ -5,7 +5,6 @@ resource "aws_instance" "vault-server" {
     instance_type = var.instance_type
     key_name = var.key_pair
     vpc_security_group_ids = [aws_security_group.vault-server-sg.id]
-    user_data = data.template_file.vault_setup.rendered
     user_data = templatefile("${path.module}/scripts/vault_install.sh", {
         AWS_ACCESS_KEY = var.aws_access_key
         AWS_SECRET_KEY = var.aws_secret_key
