@@ -1,11 +1,15 @@
 # Create a vault server
 
-data "template_file" "vault_setup" {
-    template = "${file("${path.module}/scripts/vault_install.sh")}"
-
-    vars = {
+resource "aws_instance" "vault-server" {
+    ami = data.aws_ami.ubuntu.id
+    instance_type = var.instance_type
+    key_name = var.key_pair
+    vpc_security_group_ids = [aws_security_group.vault-server-sg.id]
+    user_data = data.template_file.vault_setup.rendered
+    user_data = templatefile("${path.module}/scripts/vault_install.sh", {
         AWS_ACCESS_KEY = var.aws_access_key
         AWS_SECRET_KEY = var.aws_secret_key
+        AWS_SESSION_TOKEN = var.aws_session_token
         AMI_ID = data.aws_ami.ubuntu.id
         AWS_REGION = var.aws_region
         MYSQL_HOST = aws_db_instance.vault-mysql.endpoint
@@ -16,19 +20,15 @@ data "template_file" "vault_setup" {
         VAULT_LICENSE = var.vault_license
         CTPL_URL = var.consul_tpl_url
         GIT_BRANCH = var.git_branch
-    }
-}
-
-resource "aws_instance" "vault-server" {
-    ami = data.aws_ami.ubuntu.id
-    instance_type = var.instance_type
-    key_name = var.key_pair
-    vpc_security_group_ids = [aws_security_group.vault-server-sg.id]
-    user_data = data.template_file.vault_setup.rendered
+    })
     iam_instance_profile = aws_iam_instance_profile.vault-kms-unseal.id
     
     tags = {
         Name = "${var.prefix}-vault-unseal-demo"
+        Owner = var.owner
+        Region = var.hc_region
+        Purpose = var.purpose
+        TTL = var.ttl
     }
 }
 
@@ -71,6 +71,14 @@ resource "aws_security_group" "vault-server-sg" {
         protocol = "-1"
         cidr_blocks = ["0.0.0.0/0"]
     }
+    
+    tags = {
+        Name = "${var.prefix}-vault-unseal-demo"
+        Owner = var.owner
+        Region = var.hc_region
+        Purpose = var.purpose
+        TTL = var.ttl
+    }
 }
 
 data "aws_iam_policy_document" "assume_role" {
@@ -100,17 +108,25 @@ data "aws_iam_policy_document" "vault-kms-unseal" {
 }
 
 resource "aws_iam_role" "vault-kms-unseal" {
-  name               = "${var.prefix}-vault-demo-kms-role-unseal"
-  assume_role_policy = data.aws_iam_policy_document.assume_role.json
+    name               = "${var.prefix}-vault-demo-kms-role-unseal"
+    assume_role_policy = data.aws_iam_policy_document.assume_role.json
+    
+    tags = {
+        Name = "${var.prefix}-vault-unseal-demo"
+        Owner = var.owner
+        Region = var.hc_region
+        Purpose = var.purpose
+        TTL = var.ttl
+    }
 }
 
 resource "aws_iam_role_policy" "vault-kms-unseal" {
-  name   = "${var.prefix}-vault-demo-kms-unseal"
-  role   = aws_iam_role.vault-kms-unseal.id
-  policy = data.aws_iam_policy_document.vault-kms-unseal.json
+    name   = "${var.prefix}-vault-demo-kms-unseal"
+    role   = aws_iam_role.vault-kms-unseal.id
+    policy = data.aws_iam_policy_document.vault-kms-unseal.json
 }
 
 resource "aws_iam_instance_profile" "vault-kms-unseal" {
-  name = "${var.prefix}-vault-demo-kms-unseal"
-  role = aws_iam_role.vault-kms-unseal.name
+    name = "${var.prefix}-vault-demo-kms-unseal"
+    role = aws_iam_role.vault-kms-unseal.name
 }

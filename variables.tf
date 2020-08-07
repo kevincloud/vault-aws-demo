@@ -27,3 +27,11 @@ variable "consul_tpl_url" { }
 variable "prefix" { }
 
 variable "git_branch" { }
+
+variable "owner" { }
+
+variable "hc_region" { }
+
+variable "purpose" { }
+
+variable "ttl" { }

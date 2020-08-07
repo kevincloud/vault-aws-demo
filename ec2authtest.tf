@@ -14,7 +14,11 @@ resource "aws_instance" "vault-ec2-deny" {
     user_data = data.template_file.auth_setup.rendered
     
     tags = {
-        Name = "vault-ec2-deny"
+        Name = "${var.prefix}-vault-ec2-deny"
+        Owner = var.owner
+        Region = var.hc_region
+        Purpose = var.purpose
+        TTL = var.ttl
     }
 }
 
@@ -26,7 +30,11 @@ resource "aws_instance" "vault-ec2-allow" {
     user_data = data.template_file.auth_setup.rendered
     
     tags = {
-        Name = "vault-ec2-allow"
+        Name = "${var.prefix}-vault-ec2-allow"
+        Owner = var.owner
+        Region = var.hc_region
+        Purpose = var.purpose
+        TTL = var.ttl
     }
 }
 
@@ -47,5 +55,13 @@ resource "aws_security_group" "vault-ec2-sg" {
         to_port = 0
         protocol = "-1"
         cidr_blocks = ["0.0.0.0/0"]
+    }
+    
+    tags = {
+        Name = "${var.prefix}-vault-unseal-demo"
+        Owner = var.owner
+        Region = var.hc_region
+        Purpose = var.purpose
+        TTL = var.ttl
     }
 }

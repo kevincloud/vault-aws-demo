@@ -19,11 +19,13 @@ sudo bash -c "cat >/root/.aws/config" <<EOT
 [default]
 aws_access_key_id=${AWS_ACCESS_KEY}
 aws_secret_access_key=${AWS_SECRET_KEY}
+aws_session_token=${AWS_SESSION_TOKEN}
 EOT
 sudo bash -c "cat >/root/.aws/credentials" <<EOT
 [default]
 aws_access_key_id=${AWS_ACCESS_KEY}
 aws_secret_access_key=${AWS_SECRET_KEY}
+aws_session_token=${AWS_SESSION_TOKEN}
 EOT
 
 echo "Installing Vault..."

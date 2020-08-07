@@ -10,6 +10,14 @@ resource "aws_db_instance" "vault-mysql" {
     username = var.mysql_user
     password = var.mysql_pass
     skip_final_snapshot = true
+    
+    tags = {
+        Name = "${var.prefix}-vault-unseal-demo"
+        Owner = var.owner
+        Region = var.hc_region
+        Purpose = var.purpose
+        TTL = var.ttl
+    }
 }
 
 resource "aws_security_group" "vault-mysql-sg" {
@@ -29,5 +37,13 @@ resource "aws_security_group" "vault-mysql-sg" {
         to_port = 0
         protocol = "-1"
         cidr_blocks = ["0.0.0.0/0"]
+    }
+    
+    tags = {
+        Name = "${var.prefix}-vault-unseal-demo"
+        Owner = var.owner
+        Region = var.hc_region
+        Purpose = var.purpose
+        TTL = var.ttl
     }
 }
