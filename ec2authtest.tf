@@ -1,18 +1,12 @@
-data "template_file" "auth_setup" {
-    template = "${file("${path.module}/scripts/ec2_install.sh")}"
-
-    vars = {
-        VAULT_IP = aws_instance.vault-server.public_ip
-    }
-}
-
 resource "aws_instance" "vault-ec2-deny" {
     ami = data.aws_ami.ubuntu2.id
     instance_type = var.instance_type
     key_name = var.key_pair
     vpc_security_group_ids = [aws_security_group.vault-ec2-sg.id]
-    user_data = data.template_file.auth_setup.rendered
-    
+    user_data = templatefile("${path.module}/scripts/ec2_install.sh", {
+        VAULT_IP = aws_instance.vault-server.public_ip
+    })
+
     tags = {
         Name = "${var.prefix}-vault-ec2-deny"
         Owner = var.owner
@@ -27,7 +21,9 @@ resource "aws_instance" "vault-ec2-allow" {
     instance_type = var.instance_type
     key_name = var.key_pair
     vpc_security_group_ids = [aws_security_group.vault-ec2-sg.id]
-    user_data = data.template_file.auth_setup.rendered
+    user_data = templatefile("${path.module}/scripts/ec2_install.sh", {
+        VAULT_IP = aws_instance.vault-server.public_ip
+    })
     
     tags = {
         Name = "${var.prefix}-vault-ec2-allow"
@@ -58,7 +54,6 @@ resource "aws_security_group" "vault-ec2-sg" {
     }
     
     tags = {
-        Name = "${var.prefix}-vault-unseal-demo"
         Owner = var.owner
         Region = var.hc_region
         Purpose = var.purpose

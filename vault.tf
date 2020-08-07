@@ -73,7 +73,6 @@ resource "aws_security_group" "vault-server-sg" {
     }
     
     tags = {
-        Name = "${var.prefix}-vault-unseal-demo"
         Owner = var.owner
         Region = var.hc_region
         Purpose = var.purpose
@@ -112,7 +111,7 @@ resource "aws_iam_role" "vault-kms-unseal" {
     assume_role_policy = data.aws_iam_policy_document.assume_role.json
     
     tags = {
-        Name = "${var.prefix}-vault-unseal-demo"
+        Name = "${var.prefix}-vault-iam-role"
         Owner = var.owner
         Region = var.hc_region
         Purpose = var.purpose
