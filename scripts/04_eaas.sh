@@ -1,10 +1,10 @@
 #!/bin/bash
 
 # encryption as a service
-cd /root/eaas
+cd /root/04_eaas
 git clone https://github.com/norhe/transit-app-example.git
 
-sudo bash -c "cat >/root/eaas/s1_enable_transit.sh" <<EOT
+sudo bash -c "cat >/root/04_eaas/s1_enable_transit.sh" <<EOT
 clear
 cat <<DESCRIPTION
 The transit engine enables you to create encryption keys 
@@ -28,13 +28,13 @@ vault secrets enable -path=lob_a/workshop/transit transit > /dev/null
 # Create our customer key
 vault write -f lob_a/workshop/transit/keys/customer-key > /dev/null
 
-cd /root/eaas/app
+cd /root/04_eaas/app
 ./run
 echo "http://$VAULT_IP:5000/"
 EOT
-chmod a+x /root/eaas/s1_enable_transit.sh
+chmod a+x /root/04_eaas/s1_enable_transit.sh
 
-sudo bash -c "cat >/root/eaas/transit-app-example/backend/config.ini" <<EOT
+sudo bash -c "cat >/root/04_eaas/transit-app-example/backend/config.ini" <<EOT
 [DEFAULT]
 LogLevel = WARN
 
@@ -55,7 +55,7 @@ KeyPath=lob_a/workshop/transit
 KeyName=customer-key
 EOT
 
-sudo bash -c "cat >/root/eaas/transit-app-example/backend/config-x.ini" <<EOT
+sudo bash -c "cat >/root/04_eaas/transit-app-example/backend/config-x.ini" <<EOT
 [DEFAULT]
 LogLevel = WARN
 
@@ -76,18 +76,18 @@ KeyPath=lob_a/workshop/transit
 KeyName=customer-key
 EOT
 
-mkdir /root/eaas/app
-mv /root/eaas/transit-app-example/backend/* /root/eaas/app
-rm -r /root/eaas/transit-app-example
+mkdir /root/04_eaas/app
+mv /root/04_eaas/transit-app-example/backend/* /root/04_eaas/app
+rm -r /root/04_eaas/transit-app-example
 
-sudo bash -c "cat >/root/eaas/app/run" <<EOT
+sudo bash -c "cat >/root/04_eaas/app/run" <<EOT
 #!/bin/bash
 
-python3 /root/eaas/app/app.py > /root/eaas/app/log.txt &
+python3 /root/04_eaas/app/app.py > /root/04_eaas/app/log.txt &
 EOT
-chmod a+x /root/eaas/app/run
+chmod a+x /root/04_eaas/app/run
 
-sudo bash -c "cat >/root/eaas/s2_reconfig_transit.sh" <<EOT
+sudo bash -c "cat >/root/04_eaas/s2_reconfig_transit.sh" <<EOT
 clear
 cat <<DESCRIPTION
 By default, this application doesn't make use of the transit 
@@ -112,12 +112,12 @@ read -n1 kbd
 
 pkill python3
 
-mv /root/eaas/app/config.ini /root/eaas/app/config-z.ini
+mv /root/04_eaas/app/config.ini /root/04_eaas/app/config-z.ini
 
-mv /root/eaas/app/config-x.ini /root/eaas/app/config.ini
+mv /root/04_eaas/app/config-x.ini /root/04_eaas/app/config.ini
 
-cd /root/eaas/app
+cd /root/04_eaas/app
 ./run
 echo "http://$VAULT_IP:5000/"
 EOT
-chmod a+x /root/eaas/s2_reconfig_transit.sh
+chmod a+x /root/04_eaas/s2_reconfig_transit.sh

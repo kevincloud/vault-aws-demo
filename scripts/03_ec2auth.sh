@@ -1,6 +1,6 @@
 # ec2 auth
 
-sudo bash -c "cat >/root/ec2auth/s1_setup_auth.sh" <<EOT
+sudo bash -c "cat >/root/03_ec2auth/s1_setup_auth.sh" <<EOT
 clear
 cat <<DESCRIPTION
 We're going to configure Vault to integrate with 
@@ -52,4 +52,4 @@ vault write \\
     disallow_reauthentication=false \\
     bound_ami_id=${AMI_ID} > /dev/null
 EOT
-chmod a+x /root/ec2auth/s1_setup_auth.sh
+chmod a+x /root/03_ec2auth/s1_setup_auth.sh

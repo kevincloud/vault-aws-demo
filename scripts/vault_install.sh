@@ -93,11 +93,11 @@ sleep 5
 UNSEAL_KEY_1=`cat /root/init.txt | sed -n -e '/^Unseal Key 1/ s/.*\: *//p'`
 UNSEAL_KEY_2=`cat /root/init.txt | sed -n -e '/^Unseal Key 2/ s/.*\: *//p'`
 UNSEAL_KEY_3=`cat /root/init.txt | sed -n -e '/^Unseal Key 3/ s/.*\: *//p'`
-mkdir /root/unseal
-mkdir /root/database
-mkdir /root/ec2auth
-mkdir /root/eaas
-mkdir /root/pki
+mkdir /root/01_unseal
+mkdir /root/02_database
+mkdir /root/03_ec2auth
+mkdir /root/04_eaas
+mkdir /root/05_pki
 
 cd /root
 git clone --single-branch --branch ${GIT_BRANCH} https://github.com/kevincloud/vault-aws-demo.git

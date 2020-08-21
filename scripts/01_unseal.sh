@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Auto unseal
-sudo bash -c "cat >/root/unseal/s1_reconfig.sh" <<EOT
+sudo bash -c "cat >/root/01_unseal/s1_reconfig.sh" <<EOT
 #!/bin/bash
 BLACK="\033[0;30m"
 BLUE="\033[0;34m"
@@ -43,9 +43,9 @@ echo "Getting status..."
 sleep 3
 vault status
 EOT
-chmod a+x /root/unseal/s1_reconfig.sh
+chmod a+x /root/01_unseal/s1_reconfig.sh
 
-sudo bash -c "cat >/root/unseal/s2_unseal_migrate.sh" <<EOT
+sudo bash -c "cat >/root/01_unseal/s2_unseal_migrate.sh" <<EOT
 #!/bin/bash
 BLACK="\033[0;30m"
 BLUE="\033[0;34m"
@@ -76,9 +76,9 @@ vault operator unseal -migrate $UNSEAL_KEY_2 > /dev/null
 vault operator unseal -migrate $UNSEAL_KEY_3 > /dev/null
 vault status
 EOT
-chmod a+x /root/unseal/s2_unseal_migrate.sh
+chmod a+x /root/01_unseal/s2_unseal_migrate.sh
 
-sudo bash -c "cat >/root/unseal/s3_unseal_migrate.sh" <<EOT
+sudo bash -c "cat >/root/01_unseal/s3_unseal_migrate.sh" <<EOT
 #!/bin/bash
 BLACK="\033[0;30m"
 BLUE="\033[0;34m"
@@ -107,14 +107,14 @@ DESCRIPTION
 
 read -n1 kbd
 
-vault operator rekey -init -target=recovery -key-shares=1 -key-threshold=1 > /root/unseal/rekey.txt
+vault operator rekey -init -target=recovery -key-shares=1 -key-threshold=1 > /root/01_unseal/rekey.txt
 
-export NONCE_KEY=\$(cat /root/unseal/rekey.txt | sed -n '/^Nonce/p' | awk -F " " '{print \$2}')
+export NONCE_KEY=\$(cat /root/01_unseal/rekey.txt | sed -n '/^Nonce/p' | awk -F " " '{print \$2}')
 vault status
 EOT
-chmod a+x /root/unseal/s3_unseal_migrate.sh
+chmod a+x /root/01_unseal/s3_unseal_migrate.sh
 
-sudo bash -c "cat >/root/unseal/s4_unseal_rekey.sh" <<EOT
+sudo bash -c "cat >/root/01_unseal/s4_unseal_rekey.sh" <<EOT
 #!/bin/bash
 BLACK="\033[0;30m"
 BLUE="\033[0;34m"
@@ -166,9 +166,9 @@ vault write sys/license text=${VAULT_LICENSE} > /dev/null
 
 vault status
 EOT
-chmod a+x /root/unseal/s4_unseal_rekey.sh
+chmod a+x /root/01_unseal/s4_unseal_rekey.sh
 
-sudo bash -c "cat >/root/unseal/s99_batch_configure.sh" <<EOT
+sudo bash -c "cat >/root/01_unseal/s99_batch_configure.sh" <<EOT
 echo "Configuring auto unseal..."
 cat >>/etc/vault.d/vault.hcl <<VAULTCFG
 
@@ -186,9 +186,9 @@ vault operator unseal -migrate $UNSEAL_KEY_1 > /dev/null
 vault operator unseal -migrate $UNSEAL_KEY_2 > /dev/null
 vault operator unseal -migrate $UNSEAL_KEY_3 > /dev/null
 
-vault operator rekey -init -target=recovery -key-shares=1 -key-threshold=1 > /root/unseal/rekey.txt
+vault operator rekey -init -target=recovery -key-shares=1 -key-threshold=1 > /root/01_unseal/rekey.txt
 
-export NONCE_KEY=\$(cat /root/unseal/rekey.txt | sed -n '/^Nonce/p' | awk -F " " '{print \$2}')
+export NONCE_KEY=\$(cat /root/01_unseal/rekey.txt | sed -n '/^Nonce/p' | awk -F " " '{print \$2}')
 
 vault operator rekey -target=recovery -key-shares=1 -key-threshold=1 -nonce=\$NONCE_KEY $UNSEAL_KEY_1 > /dev/null
 vault operator rekey -target=recovery -key-shares=1 -key-threshold=1 -nonce=\$NONCE_KEY $UNSEAL_KEY_2 > /dev/null
@@ -198,4 +198,4 @@ vault write sys/license text=${VAULT_LICENSE} > /dev/null
 
 echo "Done!"
 EOT
-chmod a+x /root/unseal/s99_batch_configure.sh
+chmod a+x /root/01_unseal/s99_batch_configure.sh
