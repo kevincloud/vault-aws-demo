@@ -19,7 +19,7 @@ syslog {
 
 template {
     contents="{{ with secret \"example_com_pki/issue/web-certs\" \"common_name=www.example.com\" }}{{ .Data.certificate }}{{ end }}"
-    destination="/root/pki/www.example.com.crt"
+    destination="/root/05_pki/www.example.com.crt"
     perms = 0400
     # command = "service nginx restart"
 }
