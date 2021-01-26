@@ -34,7 +34,7 @@ sudo unzip vault.zip -d /usr/local/bin/
 
 # Server configuration
 sudo bash -c "cat >/etc/vault.d/vault.hcl" <<EOT
-storage "file" {
+storage "raft" {
   path = "/var/raft"
   node_id = "node${NODE_INDEX}"
 
