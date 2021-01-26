@@ -4,7 +4,7 @@ resource "aws_instance" "vault-ec2-deny" {
     key_name = var.key_pair
     vpc_security_group_ids = [aws_security_group.vault-ec2-sg.id]
     user_data = templatefile("${path.module}/scripts/ec2_install.sh", {
-        VAULT_IP = aws_instance.vault-server.public_ip
+        VAULT_IP = aws_instance.vault-server[0].public_ip
     })
 
     tags = {
@@ -22,7 +22,7 @@ resource "aws_instance" "vault-ec2-allow" {
     key_name = var.key_pair
     vpc_security_group_ids = [aws_security_group.vault-ec2-sg.id]
     user_data = templatefile("${path.module}/scripts/ec2_install.sh", {
-        VAULT_IP = aws_instance.vault-server.public_ip
+        VAULT_IP = aws_instance.vault-server[0].public_ip
     })
     
     tags = {
