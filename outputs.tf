@@ -3,7 +3,10 @@ output "vault-ip" {
 }
 
 output "vault-login" {
-    value = "ssh -i ~/keys/${var.key_pair}.pem ubuntu@${aws_instance.vault-server[*].public_ip}"
+    value = {
+        for instance in aws_instance.vault-server:
+        instance.id => "ssh -i ~/keys/${var.key_pair}.pem ubuntu@${instance.public_ip}"
+    }
 }
 
 output "mysql-host" {
