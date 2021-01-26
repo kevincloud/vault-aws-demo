@@ -7,7 +7,7 @@ resource "aws_instance" "vault-server" {
     key_name = var.key_pair
     vpc_security_group_ids = [aws_security_group.vault-server-sg.id]
     user_data = templatefile("${path.module}/scripts/vault_install.sh", {
-        INDEX = count.index + 1
+        NODE_INDEX = count.index + 1
         AWS_ACCESS_KEY = var.aws_access_key
         AWS_SECRET_KEY = var.aws_secret_key
         AWS_SESSION_TOKEN = var.aws_session_token
@@ -21,11 +21,13 @@ resource "aws_instance" "vault-server" {
         VAULT_LICENSE = var.vault_license
         CTPL_URL = var.consul_tpl_url
         GIT_BRANCH = var.git_branch
+        AUTOJOIN_KEY = var.autojoin_key
+        AUTOJOIN_VALUE = var.autojoin_value
     })
     iam_instance_profile = aws_iam_instance_profile.vault-kms-unseal.id
     
     tags = {
-        Name = "${var.prefix}-vault-unseal-demo"
+        Name = "${var.prefix}-vault-unseal-demo-${count.index}"
         Owner = var.owner
         Region = var.hc_region
         Purpose = var.purpose

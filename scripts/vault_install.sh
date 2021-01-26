@@ -35,7 +35,14 @@ sudo unzip vault.zip -d /usr/local/bin/
 # Server configuration
 sudo bash -c "cat >/etc/vault.d/vault.hcl" <<EOT
 storage "file" {
-  path = "/opt/vault"
+  path = "/var/raft"
+  node_id = "node${NODE_INDEX}"
+
+  retry_join {
+    auto_join = "provider=aws region=${AWS_REGION} tag_key=${AUTOJOIN_KEY} tag_value=${AUTOJOIN_VALUE}"
+    auto_join_scheme = "http"
+    auto_join_port = 8201
+  }
 }
 
 listener "tcp" {
@@ -50,15 +57,22 @@ EOT
 echo "Installing systemd service for Vault..."
 sudo bash -c "cat >/etc/systemd/system/vault.service" <<EOT
 [Unit]
-Description=Hashicorp Vault
-After=network.target
+Description=HashiCorp Vault
+Requires=network-online.target
+After=network-online.target
 
 [Service]
 Type=simple
 User=root
-WorkingDirectory=/root
-ExecStart=/usr/local/bin/vault server -config=/etc/vault.d/vault.hcl
-Restart=on-failure # or always, on-abort, etc
+Group=root
+PIDFile=/var/run/vault/vault.pid
+ExecStart=/usr/local/bin/vault server -config=/etc/vault.d/vault.hcl -log-level=debug -tls-skip-verify
+ExecReload=/bin/kill -HUP $MAINPID
+KillMode=process
+KillSignal=SIGTERM
+Restart=on-failure
+RestartSec=42s
+LimitMEMLOCK=infinity
 
 [Install]
 WantedBy=multi-user.target
@@ -120,6 +134,11 @@ vault operator unseal $UNSEAL_KEY_3
 vault login $VAULT_TOKEN
 vault secrets enable -path="secret" -version=2 kv
 vault audit enable file file_path=/var/log/vault_audit.log
+
+if [ ${NODE_INDEX} -eq 1 ]; then
+    echo "Licensing Vault..."
+    vault write sys/license text=${VAULT_LICENSE}
+fi
 
 # Add our AWS secrets
 curl \

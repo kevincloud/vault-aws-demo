@@ -24,6 +24,10 @@ variable "vault_license" { }
 
 variable "consul_tpl_url" { }
 
+variable "autojoin_key" { }
+
+variable "autojoin_value" { }
+
 variable "prefix" { }
 
 variable "git_branch" { }

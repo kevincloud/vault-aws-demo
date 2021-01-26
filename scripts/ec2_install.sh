@@ -8,6 +8,20 @@ sudo apt-get -y upgrade > /dev/null 2>&1
 sudo apt-get install -y unzip jq python3 python3-pip > /dev/null 2>&1
 pip3 install awscli
 
+mkdir -p /root/.aws
+sudo bash -c "cat >/root/.aws/config" <<EOT
+[default]
+aws_access_key_id=${AWS_ACCESS_KEY}
+aws_secret_access_key=${AWS_SECRET_KEY}
+aws_session_token=${AWS_SESSION_TOKEN}
+EOT
+sudo bash -c "cat >/root/.aws/credentials" <<EOT
+[default]
+aws_access_key_id=${AWS_ACCESS_KEY}
+aws_secret_access_key=${AWS_SECRET_KEY}
+aws_session_token=${AWS_SESSION_TOKEN}
+EOT
+
 sudo bash -c "cat >/root/s1_vault_login.sh" <<EOT
 #!/bin/bash
 clear
