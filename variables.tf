@@ -34,8 +34,10 @@ variable "git_branch" { }
 
 variable "owner" { }
 
-variable "hc_region" { }
+variable "se-region" { }
 
 variable "purpose" { }
 
 variable "ttl" { }
+
+variable "terraform" { }

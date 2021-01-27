@@ -15,6 +15,6 @@ consul_tpl_url = "https://releases.hashicorp.com/consul-template/0.24.1/consul-t
 prefix = "mycoolprefix"
 git_branch = "master"
 owner = "email@example.com"
-hc_region = "YOUR-HASHICORP-REGION"
+se-region = "YOUR-HASHICORP-REGION"
 purpose = "Demonstrate basic Vault functions"
 ttl = "24"

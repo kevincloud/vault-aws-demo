@@ -14,6 +14,10 @@ mkdir /etc/vault.d
 mkdir -p /opt/vault
 mkdir -p /root/.aws
 mkdir -p /var/run/vault
+mkdir -p /var/raft
+
+export CLIENT_IP=`curl http://169.254.169.254/latest/meta-data/local-ipv4`
+export PUBLIC_IP=`curl http://169.254.169.254/latest/meta-data/public-ipv4`
 
 sudo bash -c "cat >/root/.aws/config" <<EOT
 [default]
@@ -50,6 +54,9 @@ listener "tcp" {
   tls_disable = 1
 }
 
+cluster_addr = "http://10.0.10.21:8201"
+api_addr = "http://$PUBLIC_IP:8200"
+disable_mlock = true
 ui = true
 EOT
 

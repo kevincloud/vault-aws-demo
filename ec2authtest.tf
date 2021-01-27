@@ -13,10 +13,11 @@ resource "aws_instance" "vault-ec2-deny" {
 
     tags = {
         Name = "${var.prefix}-vault-ec2-deny"
-        Owner = var.owner
-        Region = var.hc_region
-        Purpose = var.purpose
-        TTL = var.ttl
+        owner = var.owner
+        se-egion = var.se-region
+        purpose = var.purpose
+        ttl = var.ttl
+        terraform = var.terraform
     }
 }
 
@@ -35,10 +36,11 @@ resource "aws_instance" "vault-ec2-allow" {
     
     tags = {
         Name = "${var.prefix}-vault-ec2-allow"
-        Owner = var.owner
-        Region = var.hc_region
-        Purpose = var.purpose
-        TTL = var.ttl
+        owner = var.owner
+        se-egion = var.se-region
+        purpose = var.purpose
+        ttl = var.ttl
+        terraform = var.terraform
     }
 }
 
@@ -62,9 +64,10 @@ resource "aws_security_group" "vault-ec2-sg" {
     }
     
     tags = {
-        Owner = var.owner
-        Region = var.hc_region
-        Purpose = var.purpose
-        TTL = var.ttl
+        owner = var.owner
+        se-egion = var.se-region
+        purpose = var.purpose
+        ttl = var.ttl
+        terraform = var.terraform
     }
 }

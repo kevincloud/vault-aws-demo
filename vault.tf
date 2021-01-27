@@ -6,6 +6,8 @@ resource "aws_instance" "vault-server" {
     instance_type = var.instance_type
     key_name = var.key_pair
     vpc_security_group_ids = [aws_security_group.vault-server-sg.id]
+    subnet_id = aws_subnet.public-subnet.id
+    private_ip = "10.0.10.${count.index + 21}"
     user_data = templatefile("${path.module}/scripts/vault_install.sh", {
         NODE_INDEX = count.index + 1
         AWS_ACCESS_KEY = var.aws_access_key
@@ -28,10 +30,11 @@ resource "aws_instance" "vault-server" {
     
     tags = {
         Name = "${var.prefix}-vault-unseal-demo-${count.index}"
-        Owner = var.owner
-        Region = var.hc_region
-        Purpose = var.purpose
-        TTL = var.ttl
+        owner = var.owner
+        se-egion = var.se-region
+        purpose = var.purpose
+        ttl = var.ttl
+        terraform = var.terraform
     }
 }
 
@@ -76,10 +79,11 @@ resource "aws_security_group" "vault-server-sg" {
     }
     
     tags = {
-        Owner = var.owner
-        Region = var.hc_region
-        Purpose = var.purpose
-        TTL = var.ttl
+        owner = var.owner
+        se-egion = var.se-region
+        purpose = var.purpose
+        ttl = var.ttl
+        terraform = var.terraform
     }
 }
 
@@ -115,10 +119,11 @@ resource "aws_iam_role" "vault-kms-unseal" {
     
     tags = {
         Name = "${var.prefix}-vault-iam-role"
-        Owner = var.owner
-        Region = var.hc_region
-        Purpose = var.purpose
-        TTL = var.ttl
+        owner = var.owner
+        se-egion = var.se-region
+        purpose = var.purpose
+        ttl = var.ttl
+        terraform = var.terraform
     }
 }
 
