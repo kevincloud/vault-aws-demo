@@ -1,8 +1,17 @@
 terraform {
+  required_version = ">= 0.14"
+
   required_providers {
     aws = {
       source = "hashicorp/aws"
     }
   }
-  required_version = ">= 0.13"
+
+  backend "remote" {
+    organization = "kevindemos"
+
+    workspaces {
+      name = "vault-aws-demo"
+    }
+  }
 }

@@ -14,7 +14,7 @@ resource "aws_db_instance" "vault-mysql" {
     tags = {
         Name = "${var.prefix}-vault-mysql"
         owner = var.owner
-        se-egion = var.se-region
+        se-region = var.se-region
         purpose = var.purpose
         ttl = var.ttl
         terraform = var.terraform
@@ -42,7 +42,7 @@ resource "aws_security_group" "vault-mysql-sg" {
     
     tags = {
         owner = var.owner
-        se-egion = var.se-region
+        se-region = var.se-region
         purpose = var.purpose
         ttl = var.ttl
         terraform = var.terraform

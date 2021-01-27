@@ -31,7 +31,7 @@ resource "aws_instance" "vault-server" {
     tags = {
         Name = "${var.prefix}-vault-unseal-demo-${count.index}"
         owner = var.owner
-        se-egion = var.se-region
+        se-region = var.se-region
         purpose = var.purpose
         ttl = var.ttl
         terraform = var.terraform
@@ -80,7 +80,7 @@ resource "aws_security_group" "vault-server-sg" {
     
     tags = {
         owner = var.owner
-        se-egion = var.se-region
+        se-region = var.se-region
         purpose = var.purpose
         ttl = var.ttl
         terraform = var.terraform
@@ -120,7 +120,7 @@ resource "aws_iam_role" "vault-kms-unseal" {
     tags = {
         Name = "${var.prefix}-vault-iam-role"
         owner = var.owner
-        se-egion = var.se-region
+        se-region = var.se-region
         purpose = var.purpose
         ttl = var.ttl
         terraform = var.terraform
