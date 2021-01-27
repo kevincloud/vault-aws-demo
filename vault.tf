@@ -6,7 +6,7 @@ resource "aws_instance" "vault-server" {
     instance_type = var.instance_type
     key_name = var.key_pair
     vpc_security_group_ids = [aws_security_group.vault-server-sg.id]
-    subnet_id = aws_subnet.public-subnet.id
+    # subnet_id = aws_subnet.public-subnet.id
     private_ip = "10.0.10.${count.index + 21}"
     user_data = templatefile("${path.module}/scripts/vault_install.sh", {
         NODE_INDEX = count.index + 1
@@ -41,7 +41,7 @@ resource "aws_instance" "vault-server" {
 resource "aws_security_group" "vault-server-sg" {
     name = "${var.prefix}-vault-server-sg"
     description = "webserver security group"
-    vpc_id = aws_vpc.primary-vpc.id
+    vpc_id = aws_vpc.main-vpc.id
 
     ingress {
         from_port = 22

@@ -24,7 +24,7 @@
 # resource "aws_security_group" "vault-mysql-sg" {
 #     name = "${var.prefix}-vault-mysql-sg"
 #     description = "mysql security group"
-#     vpc_id = aws_vpc.primary-vpc.id
+#     vpc_id = aws_vpc.main-vpc.id
 
 #     ingress {
 #         from_port = 3306
