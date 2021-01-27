@@ -7,7 +7,7 @@ resource "aws_db_instance" "vault-mysql" {
     identifier = "${var.prefix}${var.mysql_dbname}"
     name = "${var.prefix}${var.mysql_dbname}"
     vpc_security_group_ids = [aws_security_group.vault-mysql-sg.id]
-    db_subnet_group_name = "${var.prefix}-vault-db-subnet"
+    db_subnet_group_name = aws_db_subnet_group.vault-db-subnet.id
     username = var.mysql_user
     password = var.mysql_pass
     skip_final_snapshot = true
