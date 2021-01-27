@@ -9,9 +9,9 @@ output "vault-login" {
     }
 }
 
-output "mysql-host" {
-    value = aws_db_instance.vault-mysql.endpoint
-}
+# output "mysql-host" {
+#     value = aws_db_instance.vault-mysql.endpoint
+# }
 
 output "ec2-allow-instance" {
     value = "ssh -i ~/keys/${var.key_pair}.pem ubuntu@${aws_instance.vault-ec2-allow.public_ip}"

@@ -15,7 +15,7 @@ resource "aws_instance" "vault-server" {
         AWS_SESSION_TOKEN = var.aws_session_token
         AMI_ID = data.aws_ami.ubuntu.id
         AWS_REGION = var.aws_region
-        MYSQL_HOST = aws_db_instance.vault-mysql.endpoint
+        MYSQL_HOST = "asdf" # aws_db_instance.vault-mysql.endpoint
         MYSQL_USER = var.mysql_user
         MYSQL_PASS = var.mysql_pass
         AWS_KMS_KEY_ID = var.kms_key_id
