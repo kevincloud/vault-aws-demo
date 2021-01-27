@@ -29,6 +29,24 @@ resource "aws_subnet" "public-subnet" {
     vpc_id = aws_vpc.main-vpc.id
     cidr_block = "10.0.10.0/24"
     map_public_ip_on_launch = true
+    availability_zone = "${var.aws_region}a"
+    depends_on = [aws_internet_gateway.igw]
+
+    tags = {
+        Name = "vault-aws-public-${var.prefix}"
+        owner = var.owner
+        se-region = var.se-region
+        purpose = var.purpose
+        ttl = var.ttl
+        terraform = var.terraform
+    }
+}
+
+resource "aws_subnet" "public-subnet-2" {
+    vpc_id = aws_vpc.main-vpc.id
+    cidr_block = "10.0.11.0/24"
+    map_public_ip_on_launch = true
+    availability_zone = "${var.aws_region}b"
     depends_on = [aws_internet_gateway.igw]
 
     tags = {

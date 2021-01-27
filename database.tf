@@ -24,7 +24,7 @@ resource "aws_db_instance" "vault-mysql" {
 
 resource "aws_db_subnet_group" "vault-db-subnet" {
     name       = "${var.prefix}-vault-db-subnet"
-    subnet_ids = [aws_subnet.public-subnet.id]
+    subnet_ids = [aws_subnet.public-subnet.id, aws_subnet.public-subnet-2.id]
 
     tags = {
         Name = "Vault DB subnet group"
