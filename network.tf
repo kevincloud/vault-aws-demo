@@ -3,7 +3,7 @@ resource "aws_vpc" "primary-vpc" {
     enable_dns_hostnames = true
 
     tags = {
-        Name = "vault-aws-vpc-${var.unit_prefix}"
+        Name = "vault-aws-vpc-${var.prefix}"
         owner = var.owner
         se-region = var.se-region
         purpose = var.purpose
@@ -16,7 +16,7 @@ resource "aws_internet_gateway" "igw" {
     vpc_id = aws_vpc.primary-vpc.id
 
     tags = {
-        Name = "vault-aws-igw-${var.unit_prefix}"
+        Name = "vault-aws-igw-${var.prefix}"
         owner = var.owner
         se-region = var.se-region
         purpose = var.purpose
@@ -33,7 +33,7 @@ resource "aws_subnet" "public-subnet" {
     depends_on = [aws_internet_gateway.igw]
 
     tags = {
-        Name = "vault-aws-public-${var.unit_prefix}"
+        Name = "vault-aws-public-${var.prefix}"
         owner = var.owner
         se-region = var.se-region
         purpose = var.purpose
@@ -49,7 +49,7 @@ resource "aws_subnet" "public-subnet" {
 #     availability_zone = element(var.aws_azs, count.index)
 
 #     tags = {
-#         Name = "jp-k8s-private-subnet-${count.index}-${var.unit_prefix}"
+#         Name = "jp-k8s-private-subnet-${count.index}-${var.prefix}"
 #         "kubernetes.io/cluster/javaperks" = "owned"
 #         owner = var.owner
 #         se-region = var.se-region
@@ -69,7 +69,7 @@ resource "aws_eip" "nat-ip" {
     vpc = true
 
     tags = {
-        Name = "vault-aws-eip-${var.unit_prefix}"
+        Name = "vault-aws-eip-${var.prefix}"
         owner = var.owner
         se-region = var.se-region
         purpose = var.purpose
@@ -84,7 +84,7 @@ resource "aws_nat_gateway" "natgw" {
     depends_on      = [aws_internet_gateway.igw, aws_subnet.public-subnet]
 
     tags = {
-        Name = "jp-k8s-natgw-${var.unit_prefix}"
+        Name = "jp-k8s-natgw-${var.prefix}"
         owner = var.owner
         se-region = var.se-region
         purpose = var.purpose
@@ -101,7 +101,7 @@ resource "aws_route_table" "natgw-route" {
     }
 
     tags = {
-        Name = "vault-aws-natgw-route-${var.unit_prefix}"
+        Name = "vault-aws-natgw-route-${var.prefix}"
         owner = var.owner
         se-region = var.se-region
         purpose = var.purpose
@@ -118,7 +118,7 @@ resource "aws_route_table" "igw-route" {
     }
 
     tags = {
-        Name = "vault-aws-igw-route-${var.unit_prefix}"
+        Name = "vault-aws-igw-route-${var.prefix}"
         owner = var.owner
         se-region = var.se-region
         purpose = var.purpose
