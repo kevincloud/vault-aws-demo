@@ -41,7 +41,7 @@ resource "aws_instance" "vault-server" {
 resource "aws_security_group" "vault-server-sg" {
     name = "${var.prefix}-vault-server-sg"
     description = "webserver security group"
-    vpc_id = data.aws_vpc.primary-vpc.id
+    vpc_id = aws_vpc.primary-vpc.id
 
     ingress {
         from_port = 22
