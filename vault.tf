@@ -66,7 +66,7 @@ resource "aws_security_group" "vault-server-sg" {
 
     ingress {
         from_port = 8200
-        to_port = 8200
+        to_port = 8201
         protocol = "tcp"
         cidr_blocks = ["0.0.0.0/0"]
     }
