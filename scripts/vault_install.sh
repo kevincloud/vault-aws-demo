@@ -43,7 +43,7 @@ storage "raft" {
   node_id = "node${NODE_INDEX}"
 
   retry_join {
-    auto_join = "provider=aws region=${AWS_REGION} tag_key=${AUTOJOIN_KEY} tag_value=${AUTOJOIN_VALUE}"
+    auto_join = "provider=aws region=${AWS_REGION} tag_key=${AUTOJOIN_KEY} tag_value=${AUTOJOIN_VALUE} addr_type=private_v4 aws_access_key=${AWS_ACCESS_KEY} aws_secret_key=${AWS_SECRET_KEY} aws_session_token=${AWS_SESSION_TOKEN}"
     auto_join_scheme = "http"
     auto_join_port = 8201
   }
@@ -54,8 +54,8 @@ listener "tcp" {
   tls_disable = 1
 }
 
-cluster_addr = "http://10.0.10.21:8201"
-api_addr = "http://$PUBLIC_IP:8200"
+cluster_addr = "http://$CLIENT_IP:8201"
+api_addr = "http://$CLIENT_IP:8200"
 disable_mlock = true
 ui = true
 EOT
@@ -146,6 +146,14 @@ if [ ${NODE_INDEX} -eq 1 ]; then
     echo "Licensing Vault..."
     vault write sys/license text=${VAULT_LICENSE}
 fi
+
+sudo bash -c "cat >/root/unseal" <<EOT
+vault operator unseal $UNSEAL_KEY_1 > /dev/null
+vault operator unseal $UNSEAL_KEY_2 > /dev/null
+vault operator unseal $UNSEAL_KEY_3 > /dev/null
+EOT
+
+chmod +x /root/unseal
 
 # Add our AWS secrets
 curl \
