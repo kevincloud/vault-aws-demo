@@ -162,7 +162,7 @@ vault operator unseal $UNSEAL_KEY_3
 
 echo "Wait for cluster to come online..."
 CLUSTER_STATUS=`vault status | grep 'HA Cluster' | sed -rn 's/HA Cluster[ ]*(.*)/\1/p'`
-while [ "$CLUSTER_ADDRESS" = "n/a" ]; do
+while [ "$CLUSTER_STATUS" = "n/a" ]; do
     sleep 2
     CLUSTER_STATUS=`vault status | grep 'HA Cluster' | sed -rn 's/HA Cluster[ ]*(.*)/\1/p'`
 done
