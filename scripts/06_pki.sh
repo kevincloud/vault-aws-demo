@@ -1,5 +1,6 @@
 #!/bin/bash
 
+CURRENT_DIRECTORY="06_pki"
 # pki + consul-template
 curl -sfLo "consul-template.zip" "${CTPL_URL}"
 sudo unzip consul-template.zip -d /usr/local/bin/
@@ -19,7 +20,7 @@ syslog {
 
 template {
     contents="{{ with secret \"example_com_pki/issue/web-certs\" \"common_name=www.example.com\" }}{{ .Data.certificate }}{{ end }}"
-    destination="/root/05_pki/www.example.com.crt"
+    destination="/root/$CURRENT_DIRECTORY/www.example.com.crt"
     perms = 0400
     # command = "service nginx restart"
 }
@@ -51,7 +52,7 @@ EOT
 
 sudo systemctl enable consul-template
 
-sudo bash -c "cat >/root/05_pki/s1_enable_pki.sh" <<EOT
+sudo bash -c "cat >/root/$CURRENT_DIRECTORY/s1_enable_pki.sh" <<EOT
 clear
 cat <<DESCRIPTION
 We're going to enable a pki engine to for auto-rolling 
@@ -62,7 +63,7 @@ vault secrets enable -path=example_com_pki pki
 
 vault write -field=certificate \\\\
     example_com_pki/root/generate/internal \\\\
-    common_name=example.com > /root/05_pki/ca_cert.crt
+    common_name=example.com > /root/$CURRENT_DIRECTORY/ca_cert.crt
 
 Press any key to continue...
 DESCRIPTION
@@ -73,11 +74,11 @@ vault secrets enable -path=example_com_pki pki > /dev/null
 
 vault write -field=certificate \\
     example_com_pki/root/generate/internal \\
-    common_name=example.com > /root/05_pki/ca_cert.crt > /dev/null
+    common_name=example.com > /root/$CURRENT_DIRECTORY/ca_cert.crt > /dev/null
 EOT
-chmod a+x /root/05_pki/s1_enable_pki.sh
+chmod a+x /root/$CURRENT_DIRECTORY/s1_enable_pki.sh
 
-sudo bash -c "cat >/root/05_pki/s2_create_role.sh" <<EOT
+sudo bash -c "cat >/root/$CURRENT_DIRECTORY/s2_create_role.sh" <<EOT
 clear
 cat <<DESCRIPTION
 Next, we'll create a role which sets the lease times 
@@ -103,9 +104,9 @@ vault write example_com_pki/roles/web-certs \\
     max_ttl=30m \\
     generate_lease=true > /dev/null
 EOT
-chmod a+x /root/05_pki/s2_create_role.sh
+chmod a+x /root/$CURRENT_DIRECTORY/s2_create_role.sh
 
-sudo bash -c "cat >/root/05_pki/s3_create_cert.sh" <<EOT
+sudo bash -c "cat >/root/$CURRENT_DIRECTORY/s3_create_cert.sh" <<EOT
 clear
 cat <<DESCRIPTION
 Now we can create our first certificate. We'll do this using 
@@ -132,9 +133,9 @@ curl -s \\
     http://localhost:8200/v1/example_com_pki/issue/web-certs | jq -r .data.certificate > www.example.com.crt
 
 EOT
-chmod a+x /root/05_pki/s3_create_cert.sh
+chmod a+x /root/$CURRENT_DIRECTORY/s3_create_cert.sh
 
-sudo bash -c "cat >/root/05_pki/s4_autoroll_cert.sh" <<EOT
+sudo bash -c "cat >/root/$CURRENT_DIRECTORY/s4_autoroll_cert.sh" <<EOT
 clear
 cat <<DESCRIPTION
 On the client server, we'll use the Vault agent to monitor 
@@ -150,16 +151,46 @@ read -n1 kbd
 
 service consul-template start
 EOT
-chmod a+x /root/05_pki/s4_autoroll_cert.sh
+chmod a+x /root/$CURRENT_DIRECTORY/s4_autoroll_cert.sh
 
-sudo bash -c "cat >/root/05_pki/s5_monitor.sh" <<EOT
+sudo bash -c "cat >/root/$CURRENT_DIRECTORY/s5_monitor.sh" <<EOT
 #!/bin/bash
 
 while [ 1 ]; do
     clear
-    cat /root/05_pki/www.example.com.crt
+    cat /root/$CURRENT_DIRECTORY/www.example.com.crt
     sleep 1
 done
 EOT
-chmod a+x /root/05_pki/s5_monitor.sh
+chmod a+x /root/$CURRENT_DIRECTORY/s5_monitor.sh
+
+sudo bash -c "cat >/root/$CURRENT_DIRECTORY/runall.sh" <<EOT
+#!/bin/bash
+
+echo "Configuring PKI..."
+
+vault secrets enable -path=example_com_pki pki > /dev/null
+
+vault write -field=certificate \\
+    example_com_pki/root/generate/internal \\
+    common_name=example.com > /root/$CURRENT_DIRECTORY/ca_cert.crt > /dev/null
+
+vault write example_com_pki/roles/web-certs \\
+    allowed_domains=example.com \\
+    allow_subdomains=true \\
+    ttl=5s \\
+    max_ttl=30m \\
+    generate_lease=true > /dev/null
+
+curl -s \\
+    --request POST \\
+    --header "X-Vault-Token: $VAULT_TOKEN" \\
+    --data '{"common_name": "www.example.com" }' \\
+    http://localhost:8200/v1/example_com_pki/issue/web-certs | jq -r .data.certificate > www.example.com.crt
+
+service consul-template start
+
+echo "Done."
+EOT
+chmod a+x /root/$CURRENT_DIRECTORY/runall.sh
 

@@ -1,7 +1,7 @@
 # Create a vault server
 
 resource "aws_instance" "vault-server" {
-    count = 2
+    count = var.num_nodes
     ami = data.aws_ami.ubuntu.id
     instance_type = var.instance_type
     key_name = var.key_pair
@@ -10,6 +10,8 @@ resource "aws_instance" "vault-server" {
     private_ip = "10.0.10.${count.index + 21}"
     user_data = templatefile("${path.module}/scripts/vault_install.sh", {
         NODE_INDEX = count.index + 1
+        NUM_NODES = var.num_nodes
+        AUTO_UNSEAL = var.auto_unseal
         AWS_ACCESS_KEY = var.aws_access_key
         AWS_SECRET_KEY = var.aws_secret_key
         AWS_SESSION_TOKEN = var.aws_session_token

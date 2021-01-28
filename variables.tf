@@ -10,6 +10,8 @@ variable "key_pair" { }
 
 variable "instance_type" { }
 
+variable "num_nodes" { }
+
 variable "mysql_pass" { }
 
 variable "mysql_user" { }
@@ -27,6 +29,8 @@ variable "consul_tpl_url" { }
 variable "autojoin_key" { }
 
 variable "autojoin_value" { }
+
+variable "auto_unseal" { }
 
 variable "prefix" { }
 

@@ -1,6 +1,8 @@
 # ec2 auth
 
-sudo bash -c "cat >/root/03_ec2auth/s1_setup_auth.sh" <<EOT
+CURRENT_DIRECTORY="04_ec2auth"
+# enable ec2 auth
+sudo bash -c "cat >/root/$CURRENT_DIRECTORY/s1_setup_auth.sh" <<EOT
 clear
 cat <<DESCRIPTION
 We're going to configure Vault to integrate with 
@@ -52,4 +54,31 @@ vault write \\
     disallow_reauthentication=false \\
     bound_ami_id=${AMI_ID} > /dev/null
 EOT
-chmod a+x /root/03_ec2auth/s1_setup_auth.sh
+chmod a+x /root/$CURRENT_DIRECTORY/s1_setup_auth.sh
+
+sudo bash -c "cat >/root/$CURRENT_DIRECTORY/runall.sh" <<EOT
+echo "Configuring AWS Authentication..."
+
+vault auth enable aws > /dev/null
+
+vault write auth/aws/config/client \\
+    secret_key=${AWS_SECRET_KEY} \\
+    access_key=${AWS_ACCESS_KEY} > /dev/null
+
+vault policy write "db-policy" > /dev/null -<<EOF
+path "database/creds/app-role" {
+    capabilities = ["list", "read"]
+}
+EOF
+
+vault write \\
+    auth/aws/role/app-db-role \\
+    auth_type=ec2 \\
+    policies=db-policy \\
+    max_ttl=1h \\
+    disallow_reauthentication=false \\
+    bound_ami_id=${AMI_ID} > /dev/null
+
+echo "Done."
+EOT
+chmod a+x /root/$CURRENT_DIRECTORY/runall.sh

@@ -1,10 +1,11 @@
 #!/bin/bash
 
+$CURRENT_DIRECTORY="05_eaas"
 # encryption as a service
-cd /root/04_eaas
+cd /root/$CURRENT_DIRECTORY
 git clone https://github.com/norhe/transit-app-example.git
 
-sudo bash -c "cat >/root/04_eaas/s1_enable_transit.sh" <<EOT
+sudo bash -c "cat >/root/$CURRENT_DIRECTORY/s1_enable_transit.sh" <<EOT
 clear
 cat <<DESCRIPTION
 The transit engine enables you to create encryption keys 
@@ -28,13 +29,13 @@ vault secrets enable -path=lob_a/workshop/transit transit > /dev/null
 # Create our customer key
 vault write -f lob_a/workshop/transit/keys/customer-key > /dev/null
 
-cd /root/04_eaas/app
+cd /root/$CURRENT_DIRECTORY/app
 ./run
 echo "http://$VAULT_IP:5000/"
 EOT
-chmod a+x /root/04_eaas/s1_enable_transit.sh
+chmod a+x /root/$CURRENT_DIRECTORY/s1_enable_transit.sh
 
-sudo bash -c "cat >/root/04_eaas/transit-app-example/backend/config.ini" <<EOT
+sudo bash -c "cat >/root/$CURRENT_DIRECTORY/transit-app-example/backend/config.ini" <<EOT
 [DEFAULT]
 LogLevel = WARN
 
@@ -55,7 +56,7 @@ KeyPath=lob_a/workshop/transit
 KeyName=customer-key
 EOT
 
-sudo bash -c "cat >/root/04_eaas/transit-app-example/backend/config-x.ini" <<EOT
+sudo bash -c "cat >/root/$CURRENT_DIRECTORY/transit-app-example/backend/config-x.ini" <<EOT
 [DEFAULT]
 LogLevel = WARN
 
@@ -76,18 +77,18 @@ KeyPath=lob_a/workshop/transit
 KeyName=customer-key
 EOT
 
-mkdir /root/04_eaas/app
-mv /root/04_eaas/transit-app-example/backend/* /root/04_eaas/app
-rm -r /root/04_eaas/transit-app-example
+mkdir /root/$CURRENT_DIRECTORY/app
+mv /root/$CURRENT_DIRECTORY/transit-app-example/backend/* /root/$CURRENT_DIRECTORY/app
+rm -r /root/$CURRENT_DIRECTORY/transit-app-example
 
-sudo bash -c "cat >/root/04_eaas/app/run" <<EOT
+sudo bash -c "cat >/root/$CURRENT_DIRECTORY/app/run" <<EOT
 #!/bin/bash
 
-python3 /root/04_eaas/app/app.py > /root/04_eaas/app/log.txt &
+python3 /root/$CURRENT_DIRECTORY/app/app.py > /root/$CURRENT_DIRECTORY/app/log.txt &
 EOT
-chmod a+x /root/04_eaas/app/run
+chmod a+x /root/$CURRENT_DIRECTORY/app/run
 
-sudo bash -c "cat >/root/04_eaas/s2_reconfig_transit.sh" <<EOT
+sudo bash -c "cat >/root/$CURRENT_DIRECTORY/s2_reconfig_transit.sh" <<EOT
 clear
 cat <<DESCRIPTION
 By default, this application doesn't make use of the transit 
@@ -112,12 +113,23 @@ read -n1 kbd
 
 pkill python3
 
-mv /root/04_eaas/app/config.ini /root/04_eaas/app/config-z.ini
+mv /root/$CURRENT_DIRECTORY/app/config.ini /root/$CURRENT_DIRECTORY/app/config-z.ini
 
-mv /root/04_eaas/app/config-x.ini /root/04_eaas/app/config.ini
+mv /root/$CURRENT_DIRECTORY/app/config-x.ini /root/$CURRENT_DIRECTORY/app/config.ini
 
-cd /root/04_eaas/app
+cd /root/$CURRENT_DIRECTORY/app
 ./run
 echo "http://$VAULT_IP:5000/"
 EOT
-chmod a+x /root/04_eaas/s2_reconfig_transit.sh
+chmod a+x /root/$CURRENT_DIRECTORY/s2_reconfig_transit.sh
+
+sudo bash -c "cat >/root/$CURRENT_DIRECTORY/runall.sh" <<EOT
+echo "Configuring Transit Engine..."
+# Enable the secret engine
+vault secrets enable -path=lob_a/workshop/transit transit > /dev/null
+
+# Create our customer key
+vault write -f lob_a/workshop/transit/keys/customer-key > /dev/null
+
+EOT
+chmod a+x /root/$CURRENT_DIRECTORY/runall.sh

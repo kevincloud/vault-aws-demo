@@ -43,7 +43,7 @@ storage "raft" {
   node_id = "node${NODE_INDEX}"
 
   retry_join {
-    auto_join = "provider=aws region=${AWS_REGION} tag_key=${AUTOJOIN_KEY} tag_value=${AUTOJOIN_VALUE} addr_type=private_v4 aws_access_key=${AWS_ACCESS_KEY} aws_secret_key=${AWS_SECRET_KEY} aws_session_token=${AWS_SESSION_TOKEN}"
+    auto_join = "provider=aws region=${AWS_REGION} tag_key=${AUTOJOIN_KEY} tag_value=${AUTOJOIN_VALUE} addr_type=private_v4"
     auto_join_scheme = "http"
     auto_join_port = 8201
   }
@@ -51,11 +51,12 @@ storage "raft" {
 
 listener "tcp" {
   address     = "0.0.0.0:8200"
-  tls_disable = 1
+  cluster_address = "0.0.0.0:8201"
+  tls_disable = true
 }
 
 cluster_addr = "http://$CLIENT_IP:8201"
-api_addr = "http://$CLIENT_IP:8200"
+api_addr = "http://$PUBLIC_IP:8200"
 disable_mlock = true
 ui = true
 EOT
@@ -90,14 +91,18 @@ sudo systemctl enable vault
 
 sleep 5
 
+echo "Initializing Vault..."
 export VAULT_IP=`curl -s http://169.254.169.254/latest/meta-data/public-ipv4`
 export VAULT_ADDR=http://localhost:8200
 vault operator init -recovery-shares=1 -recovery-threshold=1 > /root/init.txt 2>&1
 export VAULT_TOKEN=`cat /root/init.txt | sed -n -e '/^Initial Root Token/ s/.*\: *//p'`
 export DB_HOST=`echo '${MYSQL_HOST}' | awk -F ":" '/1/ {print $1}'`
 
+export NODE_INDEX=${NODE_INDEX}
+export NUM_NODES=${NUM_NODES}
 export AWS_ACCESS_KEY=${AWS_ACCESS_KEY}
 export AWS_SECRET_KEY=${AWS_SECRET_KEY}
+export AWS_SESSION_TOKEN=${AWS_SESSION_TOKEN}
 export AMI_ID=${AMI_ID}
 export AWS_REGION=${AWS_REGION}
 export MYSQL_HOST=${MYSQL_HOST}
@@ -108,39 +113,57 @@ export VAULT_URL=${VAULT_URL}
 export VAULT_LICENSE=${VAULT_LICENSE}
 export CTPL_URL=${CTPL_URL}
 
-sleep 5
+sleep 10
 
 # Setup demos
+echo "Setup demos..."
 UNSEAL_KEY_1=`cat /root/init.txt | sed -n -e '/^Unseal Key 1/ s/.*\: *//p'`
 UNSEAL_KEY_2=`cat /root/init.txt | sed -n -e '/^Unseal Key 2/ s/.*\: *//p'`
 UNSEAL_KEY_3=`cat /root/init.txt | sed -n -e '/^Unseal Key 3/ s/.*\: *//p'`
 mkdir /root/01_unseal
-mkdir /root/02_database
-mkdir /root/03_ec2auth
-mkdir /root/04_eaas
-mkdir /root/05_pki
+mkdir /root/02_cluster
+mkdir /root/03_database
+mkdir /root/04_ec2auth
+mkdir /root/05_eaas
+mkdir /root/06_pki
 
 cd /root
 git clone --single-branch --branch ${GIT_BRANCH} https://github.com/kevincloud/vault-aws-demo.git
 
 . /root/vault-aws-demo/scripts/01_unseal.sh
-. /root/vault-aws-demo/scripts/02_database.sh
-. /root/vault-aws-demo/scripts/03_ec2auth.sh
-. /root/vault-aws-demo/scripts/04_eaas.sh
-. /root/vault-aws-demo/scripts/05_pki.sh
+. /root/vault-aws-demo/scripts/02_cluster.sh
+. /root/vault-aws-demo/scripts/03_database.sh
+. /root/vault-aws-demo/scripts/04_ec2auth.sh
+. /root/vault-aws-demo/scripts/05_eaas.sh
+. /root/vault-aws-demo/scripts/06_pki.sh
 
-# echo "Setting up environment variables..."
+echo "Setting up environment variables..."
 echo "export VAULT_ADDR=http://localhost:8200" >> /home/ubuntu/.profile
 echo "export VAULT_TOKEN=$VAULT_TOKEN" >> /home/ubuntu/.profile
 echo "export VAULT_ADDR=http://localhost:8200" >> /root/.profile
 echo "export VAULT_TOKEN=$VAULT_TOKEN" >> /root/.profile
 
+echo "Unsealing Vault..."
 vault operator unseal $UNSEAL_KEY_1
 vault operator unseal $UNSEAL_KEY_2
 vault operator unseal $UNSEAL_KEY_3
-vault login $VAULT_TOKEN
+
+sleep 2
+
+# vault login $VAULT_TOKEN
+echo "Enable KV2 secrets engine..."
 vault secrets enable -path="secret" -version=2 kv
+
+echo "Enable audit logging..."
 vault audit enable file file_path=/var/log/vault_audit.log
+
+echo "Update hosts file..."
+COUNT = 1
+while [ $COUNT -le $NUM_NODES ]; do
+    sed -i '1s/^/10.0.10.2'$COUNT' node'$COUNT'\n/' /etc/hosts
+    COUNT = $COUNT + 1
+done
+
 
 if [ ${NODE_INDEX} -eq 1 ]; then
     echo "Licensing Vault..."
@@ -154,6 +177,21 @@ vault operator unseal $UNSEAL_KEY_3 > /dev/null
 EOT
 
 chmod +x /root/unseal
+
+sudo bash -c "cat >/root/runall.sh" <<EOT
+echo "Configuring Complete Vault..."
+. /root/01_unseal/runall.sh
+. /root/02_cluster/runall.sh
+. /root/03_database/runall.sh
+. /root/04_ec2auth/runall.sh
+. /root/05_eaas/runall.sh
+. /root/06_pki/runall.sh
+EOT
+chmod a+x /root/runall.sh
+
+if [ "${AUTO_UNSEAL}" = "on" ]; then
+    . /root/01_unseal/runall.sh
+fi
 
 # Add our AWS secrets
 curl \
