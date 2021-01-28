@@ -32,6 +32,7 @@ resource "aws_instance" "vault-server" {
     
     tags = {
         Name = "${var.prefix}-vault-unseal-demo-${count.index}"
+        NodeID = "Node${count.index + 1}"
         owner = var.owner
         se-region = var.se-region
         purpose = var.purpose

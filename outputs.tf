@@ -5,7 +5,7 @@ output "vault-ip" {
 output "vault-login" {
     value = {
         for instance in aws_instance.vault-server:
-        instance.id => "ssh -i ~/keys/${var.key_pair}.pem ubuntu@${instance.public_ip}"
+        instance.tags["NodeID"] => "ssh -i ~/keys/${var.key_pair}.pem ubuntu@${instance.public_ip}"
     }
 }
 

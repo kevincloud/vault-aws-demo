@@ -166,6 +166,11 @@ if [ "${AUTO_UNSEAL}" = "on" ]; then
     . /root/01_unseal/runall.sh
 fi
 
+echo ""
+echo "Vault status:"
+vault status
+echo ""
+
 # vault login $VAULT_TOKEN
 echo "Enable KV2 secrets engine..."
 vault secrets enable -path="secret" -version=2 kv
