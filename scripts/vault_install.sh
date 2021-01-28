@@ -160,16 +160,17 @@ vault operator unseal $UNSEAL_KEY_1
 vault operator unseal $UNSEAL_KEY_2
 vault operator unseal $UNSEAL_KEY_3
 
-sleep 2
+echo "Wait for cluster to come online..."
+CLUSTER_STATUS=`vault status | grep 'HA Cluster' | sed -rn 's/HA Cluster[ ]*(.*)/\1/p'`
+while [ "${CLUSTER_ADDRESS}" = "n/a" ]; do
+    sleep 2
+    CLUSTER_STATUS=`vault status | grep 'HA Cluster' | sed -rn 's/HA Cluster[ ]*(.*)/\1/p'`
+done
 
+echo "Cluster online...continuing initialization..."
 if [ "${AUTO_UNSEAL}" = "on" ]; then
     . /root/01_unseal/runall.sh
 fi
-
-echo ""
-echo "Vault status:"
-vault status
-echo ""
 
 # vault login $VAULT_TOKEN
 echo "Enable KV2 secrets engine..."
