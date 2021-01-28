@@ -14,7 +14,7 @@ mkdir /etc/vault.d
 mkdir -p /opt/vault
 mkdir -p /root/.aws
 mkdir -p /var/run/vault
-mkdir -p /var/raft
+mkdir -p /var/raft${NODE_INDEX}
 
 export CLIENT_IP=`curl http://169.254.169.254/latest/meta-data/local-ipv4`
 export PUBLIC_IP=`curl http://169.254.169.254/latest/meta-data/public-ipv4`
@@ -39,7 +39,7 @@ sudo unzip vault.zip -d /usr/local/bin/
 # Server configuration
 sudo bash -c "cat >/etc/vault.d/vault.hcl" <<EOT
 storage "raft" {
-  path = "/var/raft"
+  path = "/var/raft${NODE_INDEX}"
   node_id = "node${NODE_INDEX}"
 
   retry_join {
@@ -89,7 +89,12 @@ EOT
 sudo systemctl start vault
 sudo systemctl enable vault
 
-sleep 5
+sleep 10
+
+if [ ${NODE_INDEX} -ne 1 ]; then
+    echo "Node configuration complete."
+    exit 1
+fi
 
 echo "Initializing Vault..."
 export VAULT_IP=`curl -s http://169.254.169.254/latest/meta-data/public-ipv4`
@@ -113,7 +118,7 @@ export VAULT_URL=${VAULT_URL}
 export VAULT_LICENSE=${VAULT_LICENSE}
 export CTPL_URL=${CTPL_URL}
 
-sleep 10
+sleep 20
 
 # Setup demos
 echo "Setup demos..."
@@ -150,6 +155,10 @@ vault operator unseal $UNSEAL_KEY_3
 
 sleep 2
 
+if [ "${AUTO_UNSEAL}" = "on" ]; then
+    . /root/01_unseal/runall.sh
+fi
+
 # vault login $VAULT_TOKEN
 echo "Enable KV2 secrets engine..."
 vault secrets enable -path="secret" -version=2 kv
@@ -158,10 +167,10 @@ echo "Enable audit logging..."
 vault audit enable file file_path=/var/log/vault_audit.log
 
 echo "Update hosts file..."
-COUNT = 1
+COUNT=1
 while [ $COUNT -le $NUM_NODES ]; do
     sed -i '1s/^/10.0.10.2'$COUNT' node'$COUNT'\n/' /etc/hosts
-    COUNT = $COUNT + 1
+    ((COUNT++))
 done
 
 
@@ -175,7 +184,6 @@ vault operator unseal $UNSEAL_KEY_1 > /dev/null
 vault operator unseal $UNSEAL_KEY_2 > /dev/null
 vault operator unseal $UNSEAL_KEY_3 > /dev/null
 EOT
-
 chmod +x /root/unseal
 
 sudo bash -c "cat >/root/runall.sh" <<EOT
@@ -188,10 +196,6 @@ echo "Configuring Complete Vault..."
 . /root/06_pki/runall.sh
 EOT
 chmod a+x /root/runall.sh
-
-if [ "${AUTO_UNSEAL}" = "on" ]; then
-    . /root/01_unseal/runall.sh
-fi
 
 # Add our AWS secrets
 curl \
