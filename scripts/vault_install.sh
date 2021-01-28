@@ -32,6 +32,13 @@ aws_secret_access_key=${AWS_SECRET_KEY}
 aws_session_token=${AWS_SESSION_TOKEN}
 EOT
 
+echo "Update hosts file..."
+COUNT=1
+while [ $COUNT -le $NUM_NODES ]; do
+    sed -i '1s/^/10.0.10.2'$COUNT' node'$COUNT'\n/' /etc/hosts
+    COUNT=$(($COUNT+1))
+done
+
 echo "Installing Vault..."
 curl -sfLo "vault.zip" "${VAULT_URL}"
 sudo unzip vault.zip -d /usr/local/bin/
@@ -165,14 +172,6 @@ vault secrets enable -path="secret" -version=2 kv
 
 echo "Enable audit logging..."
 vault audit enable file file_path=/var/log/vault_audit.log
-
-echo "Update hosts file..."
-COUNT=1
-while [ $COUNT -le $NUM_NODES ]; do
-    sed -i '1s/^/10.0.10.2'$COUNT' node'$COUNT'\n/' /etc/hosts
-    ((COUNT++))
-done
-
 
 if [ ${NODE_INDEX} -eq 1 ]; then
     echo "Licensing Vault..."
