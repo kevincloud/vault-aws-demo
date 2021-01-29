@@ -167,6 +167,12 @@ while [ "$CLUSTER_STATUS" = "n/a" ]; do
     CLUSTER_STATUS=`vault status | grep 'HA Cluster' | sed -rn 's/HA Cluster[ ]*(.*)/\1/p'`
 done
 
+sleep 10
+
+echo ""
+vault status
+echo ""
+
 echo "Cluster online...continuing initialization..."
 if [ "${AUTO_UNSEAL}" = "on" ]; then
     . /root/01_unseal/runall.sh
