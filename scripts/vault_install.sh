@@ -54,7 +54,10 @@ source /etc/environment
 
 RETRY_JOIN=""
 if [ ${NODE_INDEX} -ne 1 ]; then
-    RETRY_JOIN=$'\n'"  retry_join {"$'\n'"    leader_api_addr = ""http://10.0.10.21:8200"""$'\n'"  }"$'\n'
+    RETRY_JOIN="
+  retry_join {
+    leader_api_addr = ""http://10.0.10.21:8200""
+  }"
 fi
 
 # Server configuration
