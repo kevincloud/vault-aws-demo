@@ -52,23 +52,28 @@ EOF
 
 source /etc/environment
 
+RETRY_JOIN=""
+if [ ${NODE_INDEX} -ne 1 ]; then
+    RETRY_JOIN=$'\n'"  retry_join {"$'\n'"    leader_api_addr = ""http://10.0.10.21:8200"""$'\n'"  }"$'\n'
+fi
+
 # Server configuration
 sudo bash -c "cat >/etc/vault.d/vault.hcl" <<EOT
 storage "raft" {
   path = "/var/raft${NODE_INDEX}"
   node_id = "node${NODE_INDEX}"
-
-  retry_join {
-    auto_join = "provider=aws region=${AWS_REGION} tag_key=${AUTOJOIN_KEY} tag_value=${AUTOJOIN_VALUE} addr_type=private_v4"
-    auto_join_scheme = "http"
-    auto_join_port = 8201
-  }
+  $RETRY_JOIN
 }
 
 listener "tcp" {
   address     = "0.0.0.0:8200"
   cluster_address = "0.0.0.0:8201"
   tls_disable = true
+}
+
+seal "awskms" {
+    region = "${AWS_REGION}"
+    kms_key_id = "${AWS_KMS_KEY_ID}"
 }
 
 cluster_addr = "http://$CLIENT_IP:8201"
@@ -138,11 +143,11 @@ sleep 20
 
 # Setup demos
 echo "Setup demos..."
-UNSEAL_KEY_1=`cat /root/init.txt | sed -n -e '/^Unseal Key 1/ s/.*\: *//p'`
-UNSEAL_KEY_2=`cat /root/init.txt | sed -n -e '/^Unseal Key 2/ s/.*\: *//p'`
-UNSEAL_KEY_3=`cat /root/init.txt | sed -n -e '/^Unseal Key 3/ s/.*\: *//p'`
-mkdir /root/01_unseal
-mkdir /root/02_cluster
+# UNSEAL_KEY_1=`cat /root/init.txt | sed -n -e '/^Unseal Key 1/ s/.*\: *//p'`
+# UNSEAL_KEY_2=`cat /root/init.txt | sed -n -e '/^Unseal Key 2/ s/.*\: *//p'`
+# UNSEAL_KEY_3=`cat /root/init.txt | sed -n -e '/^Unseal Key 3/ s/.*\: *//p'`
+# mkdir /root/01_unseal
+# mkdir /root/02_cluster
 mkdir /root/03_database
 mkdir /root/04_ec2auth
 mkdir /root/05_eaas
@@ -151,8 +156,8 @@ mkdir /root/06_pki
 cd /root
 git clone --single-branch --branch ${GIT_BRANCH} https://github.com/kevincloud/vault-aws-demo.git
 
-. /root/vault-aws-demo/scripts/01_unseal.sh
-. /root/vault-aws-demo/scripts/02_cluster.sh
+# . /root/vault-aws-demo/scripts/01_unseal.sh
+# . /root/vault-aws-demo/scripts/02_cluster.sh
 . /root/vault-aws-demo/scripts/03_database.sh
 . /root/vault-aws-demo/scripts/04_ec2auth.sh
 . /root/vault-aws-demo/scripts/05_eaas.sh
@@ -164,10 +169,10 @@ echo "export VAULT_TOKEN=$VAULT_TOKEN" >> /home/ubuntu/.profile
 echo "export VAULT_ADDR=http://127.0.0.1:8200" >> /root/.profile
 echo "export VAULT_TOKEN=$VAULT_TOKEN" >> /root/.profile
 
-echo "Unsealing Vault..."
-vault operator unseal $UNSEAL_KEY_1
-vault operator unseal $UNSEAL_KEY_2
-vault operator unseal $UNSEAL_KEY_3
+# echo "Unsealing Vault..."
+# vault operator unseal $UNSEAL_KEY_1
+# vault operator unseal $UNSEAL_KEY_2
+# vault operator unseal $UNSEAL_KEY_3
 
 echo "Wait for cluster to come online..."
 CLUSTER_STATUS=`vault status | grep 'HA Cluster' | sed -rn 's/HA Cluster[ ]*(.*)/\1/p'`
@@ -194,17 +199,17 @@ if [ ${NODE_INDEX} -eq 1 ]; then
     vault write sys/license text=${VAULT_LICENSE}
 fi
 
-sudo bash -c "cat >/root/unseal" <<EOT
-vault operator unseal $UNSEAL_KEY_1 > /dev/null
-vault operator unseal $UNSEAL_KEY_2 > /dev/null
-vault operator unseal $UNSEAL_KEY_3 > /dev/null
-EOT
-chmod +x /root/unseal
+# sudo bash -c "cat >/root/unseal" <<EOT
+# vault operator unseal $UNSEAL_KEY_1 > /dev/null
+# vault operator unseal $UNSEAL_KEY_2 > /dev/null
+# vault operator unseal $UNSEAL_KEY_3 > /dev/null
+# EOT
+# chmod +x /root/unseal
 
 sudo bash -c "cat >/root/runall.sh" <<EOT
 echo "Configuring Complete Vault..."
-. /root/01_unseal/runall.sh
-. /root/02_cluster/runall.sh
+# . /root/01_unseal/runall.sh
+# . /root/02_cluster/runall.sh
 . /root/03_database/runall.sh
 . /root/04_ec2auth/runall.sh
 . /root/05_eaas/runall.sh
