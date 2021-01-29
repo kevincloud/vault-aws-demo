@@ -43,7 +43,7 @@ resource "aws_instance" "vault-server" {
 
 resource "aws_security_group" "vault-server-sg" {
     name = "${var.prefix}-vault-server-sg"
-    description = "webserver security group"
+    description = "Vault security group"
     vpc_id = aws_vpc.main-vpc.id
 
     ingress {
@@ -69,9 +69,16 @@ resource "aws_security_group" "vault-server-sg" {
 
     ingress {
         from_port = 8200
-        to_port = 8201
+        to_port = 8200
         protocol = "tcp"
         cidr_blocks = ["0.0.0.0/0"]
+    }
+
+    ingress {
+        from_port = 8201
+        to_port = 8201
+        protocol = "tcp"
+        cidr_blocks = ["10.0.10.0/24"]
     }
 
     egress {

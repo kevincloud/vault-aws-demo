@@ -43,6 +43,15 @@ echo "Installing Vault..."
 curl -sfLo "vault.zip" "${VAULT_URL}"
 sudo unzip vault.zip -d /usr/local/bin/
 
+sudo setcap cap_ipc_lock=+ep /usr/local/bin/vault
+
+sudo tee -a /etc/environment <<EOF
+export VAULT_ADDR=http://127.0.0.1:8200
+export VAULT_SKIP_VERIFY=true
+EOF
+
+source /etc/environment
+
 # Server configuration
 sudo bash -c "cat >/etc/vault.d/vault.hcl" <<EOT
 storage "raft" {
@@ -105,7 +114,7 @@ fi
 
 echo "Initializing Vault..."
 export VAULT_IP=`curl -s http://169.254.169.254/latest/meta-data/public-ipv4`
-export VAULT_ADDR=http://localhost:8200
+export VAULT_ADDR=http://127.0.0.1:8200
 vault operator init -recovery-shares=1 -recovery-threshold=1 > /root/init.txt 2>&1
 export VAULT_TOKEN=`cat /root/init.txt | sed -n -e '/^Initial Root Token/ s/.*\: *//p'`
 export DB_HOST=`echo '${MYSQL_HOST}' | awk -F ":" '/1/ {print $1}'`
@@ -150,9 +159,9 @@ git clone --single-branch --branch ${GIT_BRANCH} https://github.com/kevincloud/v
 . /root/vault-aws-demo/scripts/06_pki.sh
 
 echo "Setting up environment variables..."
-echo "export VAULT_ADDR=http://localhost:8200" >> /home/ubuntu/.profile
+echo "export VAULT_ADDR=http://127.0.0.1:8200" >> /home/ubuntu/.profile
 echo "export VAULT_TOKEN=$VAULT_TOKEN" >> /home/ubuntu/.profile
-echo "export VAULT_ADDR=http://localhost:8200" >> /root/.profile
+echo "export VAULT_ADDR=http://127.0.0.1:8200" >> /root/.profile
 echo "export VAULT_TOKEN=$VAULT_TOKEN" >> /root/.profile
 
 echo "Unsealing Vault..."
