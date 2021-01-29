@@ -163,8 +163,6 @@ vault operator rekey -target=recovery -key-shares=1 -key-threshold=1 -nonce=\$NO
 vault operator rekey -target=recovery -key-shares=1 -key-threshold=1 -nonce=\$NONCE_KEY $UNSEAL_KEY_2 > /dev/null
 vault operator rekey -target=recovery -key-shares=1 -key-threshold=1 -nonce=\$NONCE_KEY $UNSEAL_KEY_3 > /dev/null
 
-vault write sys/license text=${VAULT_LICENSE} > /dev/null
-
 vault status
 EOT
 chmod a+x /root/$CURRENT_DIRECTORY/s4_unseal_rekey.sh
@@ -194,8 +192,6 @@ export NONCE_KEY=\$(cat /root/$CURRENT_DIRECTORY/rekey.txt | sed -n '/^Nonce/p' 
 vault operator rekey -target=recovery -key-shares=1 -key-threshold=1 -nonce=\$NONCE_KEY $UNSEAL_KEY_1 > /dev/null
 vault operator rekey -target=recovery -key-shares=1 -key-threshold=1 -nonce=\$NONCE_KEY $UNSEAL_KEY_2 > /dev/null
 vault operator rekey -target=recovery -key-shares=1 -key-threshold=1 -nonce=\$NONCE_KEY $UNSEAL_KEY_3 > /dev/null
-
-vault write sys/license text=${VAULT_LICENSE} > /dev/null
 
 echo "Done!"
 EOT

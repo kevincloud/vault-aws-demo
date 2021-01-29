@@ -173,11 +173,6 @@ echo ""
 vault status
 echo ""
 
-echo "Cluster online...continuing initialization..."
-if [ "${AUTO_UNSEAL}" = "on" ]; then
-    . /root/01_unseal/runall.sh
-fi
-
 # vault login $VAULT_TOKEN
 echo "Enable KV2 secrets engine..."
 vault secrets enable -path="secret" -version=2 kv
@@ -220,5 +215,9 @@ curl \
     --request POST \
     --data '{"data": { "username": "vault_user", "password": "Super$ecret1" } }' \
     http://127.0.0.1:8200/v1/secret/data/creds
+
+if [ "${AUTO_UNSEAL}" = "on" ]; then
+    /root/01_unseal/runall.sh
+fi
 
 echo "Vault installation complete."
