@@ -147,12 +147,12 @@ resource "aws_iam_instance_profile" "vault-kms-unseal" {
     name = "${var.prefix}-vault-demo-kms-unseal"
     role = aws_iam_role.vault-kms-unseal.name
     
-    # tags = {
-    #     Name = "${var.prefix}-vault-instance-profile"
-    #     owner = var.owner
-    #     se-region = var.se-region
-    #     purpose = var.purpose
-    #     ttl = var.ttl
-    #     terraform = var.terraform
-    # }
+    tags = {
+        Name = "${var.prefix}-vault-instance-profile"
+        owner = var.owner
+        se-region = var.se-region
+        purpose = var.purpose
+        ttl = var.ttl
+        terraform = var.terraform
+    }
 }
