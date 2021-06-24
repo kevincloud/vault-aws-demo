@@ -6,9 +6,6 @@ resource "aws_instance" "vault-ec2-deny" {
     subnet_id = aws_subnet.public-subnet.id
     user_data = templatefile("${path.module}/scripts/ec2_install.sh", {
         VAULT_IP = aws_instance.vault-server[0].public_ip
-        AWS_ACCESS_KEY = var.aws_access_key
-        AWS_SECRET_KEY = var.aws_secret_key
-        AWS_SESSION_TOKEN = var.aws_session_token
         AWS_REGION = var.aws_region
     })
 
@@ -30,9 +27,6 @@ resource "aws_instance" "vault-ec2-allow" {
     subnet_id = aws_subnet.public-subnet.id
     user_data = templatefile("${path.module}/scripts/ec2_install.sh", {
         VAULT_IP = aws_instance.vault-server[0].public_ip
-        AWS_ACCESS_KEY = var.aws_access_key
-        AWS_SECRET_KEY = var.aws_secret_key
-        AWS_SESSION_TOKEN = var.aws_session_token
         AWS_REGION = var.aws_region
     })
     
