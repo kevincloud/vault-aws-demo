@@ -19,19 +19,6 @@ mkdir -p /var/raft${NODE_INDEX}
 export CLIENT_IP=`curl http://169.254.169.254/latest/meta-data/local-ipv4`
 export PUBLIC_IP=`curl http://169.254.169.254/latest/meta-data/public-ipv4`
 
-sudo bash -c "cat >/root/.aws/config" <<EOT
-[default]
-aws_access_key_id=${AWS_ACCESS_KEY}
-aws_secret_access_key=${AWS_SECRET_KEY}
-aws_session_token=${AWS_SESSION_TOKEN}
-EOT
-sudo bash -c "cat >/root/.aws/credentials" <<EOT
-[default]
-aws_access_key_id=${AWS_ACCESS_KEY}
-aws_secret_access_key=${AWS_SECRET_KEY}
-aws_session_token=${AWS_SESSION_TOKEN}
-EOT
-
 echo "Update hosts file..."
 COUNT=1
 while [ $COUNT -le $NUM_NODES ]; do
@@ -129,9 +116,6 @@ export DB_HOST=`echo '${MYSQL_HOST}' | awk -F ":" '/1/ {print $1}'`
 
 export NODE_INDEX=${NODE_INDEX}
 export NUM_NODES=${NUM_NODES}
-export AWS_ACCESS_KEY=${AWS_ACCESS_KEY}
-export AWS_SECRET_KEY=${AWS_SECRET_KEY}
-export AWS_SESSION_TOKEN=${AWS_SESSION_TOKEN}
 export AMI_ID=${AMI_ID}
 export AWS_REGION=${AWS_REGION}
 export MYSQL_HOST=${MYSQL_HOST}
@@ -221,12 +205,6 @@ EOT
 chmod a+x /root/runall.sh
 
 # Add our AWS secrets
-curl \
-    --header "X-Vault-Token: $VAULT_TOKEN" \
-    --request POST \
-    --data '{"data": { "aws_access_key": "${AWS_ACCESS_KEY}", "aws_secret_key": "${AWS_SECRET_KEY}" } }' \
-    http://127.0.0.1:8200/v1/secret/data/aws
-
 curl \
     --header "X-Vault-Token: $VAULT_TOKEN" \
     --request POST \
