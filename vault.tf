@@ -12,9 +12,6 @@ resource "aws_instance" "vault-server" {
         NODE_INDEX = count.index + 1
         NUM_NODES = var.num_nodes
         AUTO_UNSEAL = var.auto_unseal
-        AWS_ACCESS_KEY = var.aws_access_key
-        AWS_SECRET_KEY = var.aws_secret_key
-        AWS_SESSION_TOKEN = var.aws_session_token
         AMI_ID = data.aws_ami.ubuntu.id
         AWS_REGION = var.aws_region
         MYSQL_HOST = aws_db_instance.vault-mysql.endpoint
