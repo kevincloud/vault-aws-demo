@@ -4,7 +4,7 @@
 echo 'libc6 libraries/restart-without-asking boolean true' | sudo debconf-set-selections
 export DEBIAN_FRONTEND=noninteractive
 sudo apt-get -y update > /dev/null 2>&1
-sudo apt-get -y upgrade > /dev/null 2>&1
+# sudo apt-get -y upgrade > /dev/null 2>&1
 sudo apt-get install -y unzip jq python3 python3-pip > /dev/null 2>&1
 pip3 install awscli
 
@@ -75,7 +75,7 @@ Our application can login without needing to pass secrets.
 signed_request=\\\$(python3 /root/sign_request.py ${VAULT_IP})
 iam_request_url=\\\$(echo \\\$signed_request | jq -r .iam_request_url)
 iam_request_body=\\\$(echo \\\$signed_request | jq -r .iam_request_body)
-iam_request_headers=\$(echo \\\$signed_request | jq -r .iam_request_headers)
+iam_request_headers=\\\$(echo \\\$signed_request | jq -r .iam_request_headers)
 
 # Create data payload
 data=\\\$(cat <<EOF
