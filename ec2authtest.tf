@@ -99,7 +99,7 @@ data "aws_iam_policy_document" "vault-ec2-demo" {
   }
 }
 
-resource "aws_iam_role" "vault-ec2-demo" {
+resource "aws_iam_role" "vault-ec2-demo-role" {
     name               = "${var.prefix}-vault-ec2-demo-role"
     assume_role_policy = data.aws_iam_policy_document.assume-ec2-role.json
     
