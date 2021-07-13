@@ -142,7 +142,7 @@ On the client server, we'll use the Vault agent to monitor
 certificate management. Vault agent will need to run as a 
 service.
 
-service vault start
+service consul-template start
 
 Press any key to continue...
 DESCRIPTION

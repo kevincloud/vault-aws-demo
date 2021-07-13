@@ -68,9 +68,18 @@ EOT
 sudo bash -c "cat >/root/s1_vault_login.sh" <<EOT
 #!/bin/bash
 clear
+instance_role=$(curl -s http://169.254.169.254/latest/meta-data/iam/info | jq -r .InstanceProfileArn)
+
 cat <<DESCRIPTION
 Our application can login without needing to pass secrets.
 
+Press any key to continue...
+DESCRIPTION
+
+read -n1 kbd
+
+clear
+cat <<DESCRIPTION
 # Get signed URL
 signed_request=\\\$(python3 /root/sign_request.py ${VAULT_IP})
 iam_request_url=\\\$(echo \\\$signed_request | jq -r .iam_request_url)
@@ -95,11 +104,14 @@ curl -s \\\\
   --data "\\\$data" \\\\
   "http://${VAULT_IP}:8200/v1/auth/aws/login"
 
+This instance role is: \\\$instance_role
+
 Press any key to continue...
 DESCRIPTION
 
 read -n1 kbd
 
+clear
 # Get signed URL
 signed_request=\$(python3 /root/sign_request.py ${VAULT_IP})
 iam_request_url=\$(echo \$signed_request | jq -r .iam_request_url)
