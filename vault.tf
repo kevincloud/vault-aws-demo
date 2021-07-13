@@ -114,6 +114,7 @@ data "aws_iam_policy_document" "vault-demo" {
     resources = ["*"]
 
     actions = [
+      "iam:GetRole",
       "ec2:DescribeInstances",
       "ec2:DescribeTags",
       "ec2messages:GetMessages",
