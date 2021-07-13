@@ -72,19 +72,19 @@ cat <<DESCRIPTION
 Our application can login without needing to pass secrets.
 
 # Get signed URL
-signed_request=\$(python3 /root/sign-request.py ${VAULT_IP})
-iam_request_url=\$(echo $signed_request | jq -r .iam_request_url)
-iam_request_body=\$(echo $signed_request | jq -r .iam_request_body)
-iam_request_headers=\$(echo $signed_request | jq -r .iam_request_headers)
+signed_request=\\\$(python3 /root/sign_request.py ${VAULT_IP})
+iam_request_url=\\\$(echo \\\$signed_request | jq -r .iam_request_url)
+iam_request_body=\\\$(echo \\\$signed_request | jq -r .iam_request_body)
+iam_request_headers=\$(echo \\\$signed_request | jq -r .iam_request_headers)
 
 # Create data payload
-data=$(cat <<EOF
+data=\\\$(cat <<EOF
 {
   "role": "app-db-role",
   "iam_http_request_method": "POST",
-  "iam_request_url": "\$iam_request_url",
-  "iam_request_body": "\$iam_request_body",
-  "iam_request_headers": "\$iam_request_headers"
+  "iam_request_url": "\\\$iam_request_url",
+  "iam_request_body": "\\\$iam_request_body",
+  "iam_request_headers": "\\\$iam_request_headers"
 }
 EOF
 )
@@ -101,13 +101,13 @@ DESCRIPTION
 read -n1 kbd
 
 # Get signed URL
-signed_request=\$(python3 /root/sign-request.py ${VAULT_IP})
-iam_request_url=\$(echo $signed_request | jq -r .iam_request_url)
-iam_request_body=\$(echo $signed_request | jq -r .iam_request_body)
-iam_request_headers=\$(echo $signed_request | jq -r .iam_request_headers)
+signed_request=\$(python3 /root/sign_request.py ${VAULT_IP})
+iam_request_url=\$(echo \$signed_request | jq -r .iam_request_url)
+iam_request_body=\$(echo \$signed_request | jq -r .iam_request_body)
+iam_request_headers=\$(echo \$signed_request | jq -r .iam_request_headers)
 
 # Create data payload
-data=$(cat <<EOF
+data=\$(cat <<EOF
 {
   "role": "app-db-role",
   "iam_http_request_method": "POST",

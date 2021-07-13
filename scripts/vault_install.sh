@@ -217,3 +217,5 @@ if [ "${AUTO_UNSEAL}" = "on" ]; then
 fi
 
 echo "Vault installation complete."
+
+#
