@@ -155,7 +155,7 @@ vault login --method=userpass username=james
 
 vault read database/creds/app-role
 
-export VAULT_TOKEN=$OLD_VAULT_TOKEN
+export VAULT_TOKEN=$VAULT_TOKEN
 unset OLD_VAULT_TOKEN
 EOT
 chmod a+x /root/$CURRENT_DIRECTORY/s4_james_login.sh
@@ -179,7 +179,7 @@ vault login --method=userpass username=sally
 
 vault read database/creds/app-role
 
-export VAULT_TOKEN=$OLD_VAULT_TOKEN
+export VAULT_TOKEN=$VAULT_TOKEN
 unset OLD_VAULT_TOKEN
 EOT
 chmod a+x /root/$CURRENT_DIRECTORY/s5_sally_login.sh

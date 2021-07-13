@@ -1,6 +1,6 @@
 #!/bin/bash
 
-$CURRENT_DIRECTORY="05_eaas"
+CURRENT_DIRECTORY="05_eaas"
 # encryption as a service
 cd /root/$CURRENT_DIRECTORY
 git clone https://github.com/norhe/transit-app-example.git
