@@ -73,7 +73,6 @@ instance_role=$(curl -s http://169.254.169.254/latest/meta-data/iam/info | jq -r
 cat <<DESCRIPTION
 Our application can login without needing to pass secrets.
 
-cat <<DESCRIPTION
 # Get signed URL
 signed_request=\\\$(python3 /root/sign_request.py ${VAULT_IP})
 iam_request_url=\\\$(echo \\\$signed_request | jq -r .iam_request_url)
@@ -86,6 +85,7 @@ DESCRIPTION
 read -n1 kbd
 
 clear
+cat <<DESCRIPTION
 # Create data payload
 data=\\\$(cat <<EOF
 {
@@ -112,6 +112,10 @@ DESCRIPTION
 read -n1 kbd
 
 clear
+
+echo "Attempting to login..."
+echo ""
+
 # Get signed URL
 signed_request=\$(python3 /root/sign_request.py ${VAULT_IP})
 iam_request_url=\$(echo \$signed_request | jq -r .iam_request_url)
@@ -139,8 +143,10 @@ curl -s \\
 export CLIENT_TOKEN="\$(cat auth.txt | jq -r .auth.client_token | tr -d '\n')"
 
 if [ "\$CLIENT_TOKEN" != "null" ]; then
+  echo "Login successful!"
   echo "Your token is: \$CLIENT_TOKEN"
 else
+  echo "Login failed!"
   cat auth.txt | jq -r .errors[0]
 fi
 EOT
