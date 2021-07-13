@@ -25,7 +25,7 @@ resource "aws_instance" "vault-server" {
         AUTOJOIN_KEY = var.autojoin_key
         AUTOJOIN_VALUE = var.autojoin_value
     })
-    iam_instance_profile = aws_iam_instance_profile.vault-kms-unseal.id
+    iam_instance_profile = aws_iam_instance_profile.vault-demo.id
     
     tags = {
         Name = "${var.prefix}-vault-unseal-demo-${count.index}"
@@ -106,22 +106,29 @@ data "aws_iam_policy_document" "assume_role" {
   }
 }
 
-data "aws_iam_policy_document" "vault-kms-unseal" {
+data "aws_iam_policy_document" "vault-demo" {
   statement {
-    sid       = "VaultKMSUnseal"
+    sid       = "VaultDemo"
     effect    = "Allow"
     resources = ["*"]
 
     actions = [
+      "ec2:DescribeInstances",
+      "ec2:DescribeTags",
+      "ec2messages:GetMessages",
+      "ssm:UpdateInstanceInformation",
+      "ssm:ListInstanceAssociations",
+      "ssm:ListAssociations",
       "kms:Encrypt",
       "kms:Decrypt",
-      "kms:DescribeKey"
+      "kms:DescribeKey",
+      "s3:*"
     ]
   }
 }
 
-resource "aws_iam_role" "vault-kms-unseal" {
-    name               = "${var.prefix}-vault-demo-kms-role-unseal"
+resource "aws_iam_role" "vault-demo" {
+    name               = "${var.prefix}-vault-demo-role"
     assume_role_policy = data.aws_iam_policy_document.assume_role.json
     
     tags = {
@@ -134,15 +141,15 @@ resource "aws_iam_role" "vault-kms-unseal" {
     }
 }
 
-resource "aws_iam_role_policy" "vault-kms-unseal" {
-    name   = "${var.prefix}-vault-demo-kms-unseal"
-    role   = aws_iam_role.vault-kms-unseal.id
-    policy = data.aws_iam_policy_document.vault-kms-unseal.json
+resource "aws_iam_role_policy" "vault-demo" {
+    name   = "${var.prefix}-vault-demo"
+    role   = aws_iam_role.vault-demo-role.id
+    policy = data.aws_iam_policy_document.vault-demo.json
 }
 
-resource "aws_iam_instance_profile" "vault-kms-unseal" {
-    name = "${var.prefix}-vault-demo-kms-unseal"
-    role = aws_iam_role.vault-kms-unseal.name
+resource "aws_iam_instance_profile" "vault-demo" {
+    name = "${var.prefix}-vault-demo"
+    role = aws_iam_role.vault-demo-role.name
     
     tags = {
         Name = "${var.prefix}-vault-instance-profile"
