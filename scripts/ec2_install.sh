@@ -126,7 +126,11 @@ curl -s \\
 
 export CLIENT_TOKEN="\$(cat auth.txt | jq -r .auth.client_token | tr -d '\n')"
 
-echo \$CLIENT_TOKEN
+if [ "\$CLIENT_TOKEN" != "null" ]; then
+  echo "Your token is: \$CLIENT_TOKEN"
+else
+  cat auth.txt | jq -r .errors[0]
+fi
 EOT
 chmod a+x /root/s1_vault_login.sh
 
