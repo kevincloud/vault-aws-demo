@@ -11,10 +11,6 @@ we're going to authenticate using the AMI ID.
 
 vault auth enable aws
 
-vault write auth/aws/config/client \\\\
-    secret_key=XXXXXXXXXX \\\\
-    access_key=XXXXXX
-
 vault policy write "db-policy" -<<EOF
 path "database/creds/app-role" {
     capabilities = ["list", "read"]
@@ -23,11 +19,10 @@ EOF
 
 vault write \\\\
     auth/aws/role/app-db-role \\\\
-    auth_type=ec2 \\\\
+    auth_type=iam \\\\
     policies=db-policy \\\\
     max_ttl=1h \\\\
-    disallow_reauthentication=false \\\\
-    bound_ami_id=${AMI_ID}
+    bound_iam_principal_arn=${ROLE_ARN}
 
 Press any key to continue...
 DESCRIPTION
@@ -36,10 +31,6 @@ read -n1 kbd
 
 vault auth enable aws > /dev/null
 
-vault write auth/aws/config/client \\
-    secret_key=${AWS_SECRET_KEY} \\
-    access_key=${AWS_ACCESS_KEY} > /dev/null
-
 vault policy write "db-policy" > /dev/null -<<EOF
 path "database/creds/app-role" {
     capabilities = ["list", "read"]
@@ -48,11 +39,10 @@ EOF
 
 vault write \\
     auth/aws/role/app-db-role \\
-    auth_type=ec2 \\
+    auth_type=iam \\
     policies=db-policy \\
     max_ttl=1h \\
-    disallow_reauthentication=false \\
-    bound_ami_id=${AMI_ID} > /dev/null
+    bound_iam_principal_arn=${ROLE_ARN} > /dev/null
 EOT
 chmod a+x /root/$CURRENT_DIRECTORY/s1_setup_auth.sh
 
@@ -61,10 +51,6 @@ echo "Configuring AWS Authentication..."
 
 vault auth enable aws > /dev/null
 
-vault write auth/aws/config/client \\
-    secret_key=${AWS_SECRET_KEY} \\
-    access_key=${AWS_ACCESS_KEY} > /dev/null
-
 vault policy write "db-policy" > /dev/null -<<EOF
 path "database/creds/app-role" {
     capabilities = ["list", "read"]
@@ -73,11 +59,10 @@ EOF
 
 vault write \\
     auth/aws/role/app-db-role \\
-    auth_type=ec2 \\
+    auth_type=iam \\
     policies=db-policy \\
     max_ttl=1h \\
-    disallow_reauthentication=false \\
-    bound_ami_id=${AMI_ID} > /dev/null
+    bound_iam_principal_arn=${ROLE_ARN} > /dev/null
 
 echo "Done."
 EOT

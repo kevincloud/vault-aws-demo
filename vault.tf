@@ -24,6 +24,7 @@ resource "aws_instance" "vault-server" {
         GIT_BRANCH = var.git_branch
         AUTOJOIN_KEY = var.autojoin_key
         AUTOJOIN_VALUE = var.autojoin_value
+        ROLE_ARN = aws_iam_role.vault-ec2-allow-demo-role.arn
     })
     iam_instance_profile = aws_iam_instance_profile.vault-demo.id
     

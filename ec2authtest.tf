@@ -8,7 +8,7 @@ resource "aws_instance" "vault-ec2-deny" {
         VAULT_IP = aws_instance.vault-server[0].public_ip
         AWS_REGION = var.aws_region
     })
-    iam_instance_profile = aws_iam_instance_profile.vault-ec2-demo.id
+    iam_instance_profile = aws_iam_instance_profile.vault-ec2-deny-demo.id
 
     tags = {
         Name = "${var.prefix}-vault-ec2-deny"
@@ -30,7 +30,7 @@ resource "aws_instance" "vault-ec2-allow" {
         VAULT_IP = aws_instance.vault-server[0].public_ip
         AWS_REGION = var.aws_region
     })
-    iam_instance_profile = aws_iam_instance_profile.vault-ec2-demo.id
+    iam_instance_profile = aws_iam_instance_profile.vault-ec2-allow-demo.id
     
     tags = {
         Name = "${var.prefix}-vault-ec2-allow"
@@ -99,12 +99,16 @@ data "aws_iam_policy_document" "vault-ec2-demo" {
   }
 }
 
-resource "aws_iam_role" "vault-ec2-demo-role" {
-    name               = "${var.prefix}-vault-ec2-demo-role"
+###
+# EC2 IAM for Deny access
+###
+
+resource "aws_iam_role" "vault-ec2-deny-demo-role" {
+    name               = "${var.prefix}-vault-ec2-deny-demo-role"
     assume_role_policy = data.aws_iam_policy_document.assume-ec2-role.json
     
     tags = {
-        Name = "${var.prefix}-vault-ec2-iam-role"
+        Name = "${var.prefix}-vault-ec2-deny-iam-role"
         owner = var.owner
         se-region = var.se-region
         purpose = var.purpose
@@ -113,18 +117,56 @@ resource "aws_iam_role" "vault-ec2-demo-role" {
     }
 }
 
-resource "aws_iam_role_policy" "vault-ec2-demo" {
-    name   = "${var.prefix}-vault-ec2-demo"
-    role   = aws_iam_role.vault-ec2-demo-role.id
+resource "aws_iam_role_policy" "vault-ec2-deny-demo" {
+    name   = "${var.prefix}-vault-ec2-deny-demo"
+    role   = aws_iam_role.vault-ec2-deny-demo-role.id
     policy = data.aws_iam_policy_document.vault-ec2-demo.json
 }
 
-resource "aws_iam_instance_profile" "vault-ec2-demo" {
-    name = "${var.prefix}-vault-ec2-demo"
-    role = aws_iam_role.vault-ec2-demo-role.name
+resource "aws_iam_instance_profile" "vault-ec2-deny-demo" {
+    name = "${var.prefix}-vault-ec2-deny-demo"
+    role = aws_iam_role.vault-ec2-deny-demo-role.name
     
     tags = {
-        Name = "${var.prefix}-vault-ec2-instance-profile"
+        Name = "${var.prefix}-vault-ec2-deny-instance-profile"
+        owner = var.owner
+        se-region = var.se-region
+        purpose = var.purpose
+        ttl = var.ttl
+        terraform = var.terraform
+    }
+}
+
+###
+# EC2 IAM for Allow access
+###
+
+resource "aws_iam_role" "vault-ec2-allow-demo-role" {
+    name               = "${var.prefix}-vault-ec2-allow-demo-role"
+    assume_role_policy = data.aws_iam_policy_document.assume-ec2-role.json
+    
+    tags = {
+        Name = "${var.prefix}-vault-ec2-allow-iam-role"
+        owner = var.owner
+        se-region = var.se-region
+        purpose = var.purpose
+        ttl = var.ttl
+        terraform = var.terraform
+    }
+}
+
+resource "aws_iam_role_policy" "vault-ec2-allow-demo" {
+    name   = "${var.prefix}-vault-ec2-allow-demo"
+    role   = aws_iam_role.vault-ec2-allow-demo-role.id
+    policy = data.aws_iam_policy_document.vault-ec2-demo.json
+}
+
+resource "aws_iam_instance_profile" "vault-ec2-allow-demo" {
+    name = "${var.prefix}-vault-ec2-allow-demo"
+    role = aws_iam_role.vault-ec2-allow-demo-role.name
+    
+    tags = {
+        Name = "${var.prefix}-vault-ec2-allow-instance-profile"
         owner = var.owner
         se-region = var.se-region
         purpose = var.purpose
