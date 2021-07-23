@@ -15,8 +15,9 @@ resource "aws_instance" "vault-server" {
         AMI_ID = data.aws_ami.ubuntu.id
         AWS_REGION = var.aws_region
         MYSQL_HOST = aws_db_instance.vault-mysql.endpoint
-        MYSQL_USER = var.mysql_user
-        MYSQL_PASS = var.mysql_pass
+        POSTGRES_HOST = aws_db_instance.vault-postgres.endpoint
+        DB_USER = var.db_user
+        DB_PASS = var.db_pass
         AWS_KMS_KEY_ID = var.kms_key_id
         VAULT_URL = var.vault_dl_url
         VAULT_LICENSE = var.vault_license
@@ -124,7 +125,8 @@ data "aws_iam_policy_document" "vault-demo" {
       "kms:Encrypt",
       "kms:Decrypt",
       "kms:DescribeKey",
-      "s3:*"
+      "s3:*",
+      "rds:*"
     ]
   }
 }

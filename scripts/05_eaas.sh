@@ -42,8 +42,8 @@ LogLevel = WARN
 [DATABASE]
 Address=$DB_HOST
 Port=3306
-User=${MYSQL_USER}
-Password=${MYSQL_PASS}
+User=${DB_USER}
+Password=${DB_PASS}
 Database=my_app
 
 [VAULT]
@@ -63,8 +63,8 @@ LogLevel = WARN
 [DATABASE]
 Address=$DB_HOST
 Port=3306
-User=${MYSQL_USER}
-Password=${MYSQL_PASS}
+User=${DB_USER}
+Password=${DB_PASS}
 Database=my_app
 
 [VAULT]

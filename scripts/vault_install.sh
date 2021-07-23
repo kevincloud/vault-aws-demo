@@ -113,14 +113,16 @@ export VAULT_ADDR=http://127.0.0.1:8200
 vault operator init -recovery-shares=1 -recovery-threshold=1 > /root/init.txt 2>&1
 export VAULT_TOKEN=`cat /root/init.txt | sed -n -e '/^Initial Root Token/ s/.*\: *//p'`
 export DB_HOST=`echo '${MYSQL_HOST}' | awk -F ":" '/1/ {print $1}'`
+export TOKEN_DB_HOST=`echo '${POSTGRES_HOST}' | awk -F ":" '/1/ {print $1}'`
 
 export NODE_INDEX=${NODE_INDEX}
 export NUM_NODES=${NUM_NODES}
 export AMI_ID=${AMI_ID}
 export AWS_REGION=${AWS_REGION}
 export MYSQL_HOST=${MYSQL_HOST}
-export MYSQL_USER=${MYSQL_USER}
-export MYSQL_PASS=${MYSQL_PASS}
+export POSTGRES_HOST=${POSTGRES_HOST}
+export DB_USER=${DB_USER}
+export DB_PASS=${DB_PASS}
 export AWS_KMS_KEY_ID=${AWS_KMS_KEY_ID}
 export VAULT_URL=${VAULT_URL}
 export VAULT_LICENSE=${VAULT_LICENSE}

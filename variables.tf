@@ -4,13 +4,17 @@ variable "key_pair" { }
 
 variable "instance_type" { }
 
+variable "db_instance_type" { }
+
 variable "num_nodes" { }
 
-variable "mysql_pass" { }
+variable "db_pass" { }
 
-variable "mysql_user" { }
+variable "db_user" { }
 
 variable "mysql_dbname" { }
+
+variable "postgres_dbname" { }
 
 variable "kms_key_id" { }
 

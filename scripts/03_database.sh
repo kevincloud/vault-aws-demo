@@ -35,8 +35,8 @@ vault write database/config/sedemovaultdb \\
     plugin_name="mysql-database-plugin" \\
     connection_url="{{username}}:{{password}}@tcp(${MYSQL_HOST})/" \\
     allowed_roles="app-role" \\
-    username="${MYSQL_USER}" \\
-    password="${MYSQL_PASS}" > /dev/null
+    username="${DB_USER}" \\
+    password="${DB_PASS}" > /dev/null
 
 vault write database/roles/app-role \\
     db_name=sedemovaultdb \\
@@ -193,8 +193,8 @@ vault write database/config/sedemovaultdb \\
     plugin_name="mysql-database-plugin" \\
     connection_url="{{username}}:{{password}}@tcp(${MYSQL_HOST})/" \\
     allowed_roles="app-role" \\
-    username="${MYSQL_USER}" \\
-    password="${MYSQL_PASS}" > /dev/null
+    username="${DB_USER}" \\
+    password="${DB_PASS}" > /dev/null
 
 vault write database/roles/app-role \\
     db_name=sedemovaultdb \\

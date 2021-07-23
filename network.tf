@@ -148,3 +148,18 @@ resource "aws_route_table_association" "route-out" {
     route_table_id = aws_route_table.igw-route.id
     subnet_id      = aws_subnet.public-subnet.id
 }
+
+resource "aws_db_subnet_group" "vault-db-subnet" {
+    name       = "${var.prefix}-vault-db-subnet"
+    subnet_ids = [aws_subnet.public-subnet.id, aws_subnet.public-subnet-2.id]
+
+    tags = {
+        Name = "Vault DB subnet group"
+            owner = var.owner
+            se-region = var.se-region
+            purpose = var.purpose
+            ttl = var.ttl
+            terraform = var.terraform
+    }
+}
+
