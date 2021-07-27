@@ -24,7 +24,7 @@ export PUBLIC_IP=`curl http://169.254.169.254/latest/meta-data/public-ipv4`
 
 echo "Update hosts file..."
 COUNT=1
-while [ $COUNT -le $NUM_NODES ]; do
+while [ $COUNT -le ${NUM_NODES} ]; do
     sed -i '1s/^/10.0.10.2'$COUNT' node'$COUNT'\n/' /etc/hosts
     COUNT=$(($COUNT+1))
 done
@@ -40,7 +40,7 @@ export VAULT_ADDR=http://127.0.0.1:8200
 export VAULT_SKIP_VERIFY=true
 EOF
 
-source /etc/environment
+. /etc/environment
 
 RETRY_JOIN=""
 if [ ${NODE_INDEX} -ne 1 ]; then
@@ -148,6 +148,7 @@ mkdir /root/04_ec2auth
 mkdir /root/05_eaas
 mkdir /root/06_pki
 mkdir /root/07_tokenization
+mkdir /root/08_fpe
 
 cd /root
 git clone --single-branch --branch ${GIT_BRANCH} https://github.com/kevincloud/vault-aws-demo.git
@@ -158,6 +159,8 @@ git clone --single-branch --branch ${GIT_BRANCH} https://github.com/kevincloud/v
 . /root/vault-aws-demo/scripts/04_ec2auth.sh
 . /root/vault-aws-demo/scripts/05_eaas.sh
 . /root/vault-aws-demo/scripts/06_pki.sh
+. /root/vault-aws-demo/scripts/07_tokenization.sh
+. /root/vault-aws-demo/scripts/08_fpe.sh
 
 echo "Setting up environment variables..."
 echo "export VAULT_ADDR=http://127.0.0.1:8200" >> /home/ubuntu/.profile
@@ -220,9 +223,9 @@ curl \
     --data '{"data": { "username": "vault_user", "password": "Super$ecret1" } }' \
     http://127.0.0.1:8200/v1/secret/data/creds
 
-if [ "${AUTO_UNSEAL}" = "on" ]; then
-    /root/01_unseal/runall.sh
-fi
+# if [ "${AUTO_UNSEAL}" = "on" ]; then
+#     /root/01_unseal/runall.sh
+# fi
 
 echo "Vault installation complete."
 
