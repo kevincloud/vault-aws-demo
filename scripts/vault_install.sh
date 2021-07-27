@@ -3,10 +3,13 @@
 
 echo "Preparing to install Vault..."
 echo 'libc6 libraries/restart-without-asking boolean true' | sudo debconf-set-selections
+echo "deb http://apt.postgresql.org/pub/repos/apt $(lsb_release -cs)-pgdg main" > /etc/apt/sources.list.d/pgdg.list
+wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | sudo apt-key add -
+
 export DEBIAN_FRONTEND=noninteractive
 sudo apt-get -y update > /dev/null 2>&1
-sudo apt-get -y upgrade > /dev/null 2>&1
-sudo apt-get install -y unzip jq cowsay mysql-client > /dev/null 2>&1
+# sudo apt-get -y upgrade > /dev/null 2>&1
+sudo apt-get install -y unzip jq cowsay mysql-client postgresql-client-13 > /dev/null 2>&1
 sudo apt-get install -y python3 python3-pip
 pip3 install awscli Flask mysql-connector-python hvac
 
@@ -120,7 +123,9 @@ export NUM_NODES=${NUM_NODES}
 export AMI_ID=${AMI_ID}
 export AWS_REGION=${AWS_REGION}
 export MYSQL_HOST=${MYSQL_HOST}
+export MYSQL_DBNAME=${MYSQL_DBNAME}
 export POSTGRES_HOST=${POSTGRES_HOST}
+export POSTGRES_DBNAME=${POSTGRES_DBNAME}
 export DB_USER=${DB_USER}
 export DB_PASS=${DB_PASS}
 export AWS_KMS_KEY_ID=${AWS_KMS_KEY_ID}
@@ -142,6 +147,7 @@ mkdir /root/03_database
 mkdir /root/04_ec2auth
 mkdir /root/05_eaas
 mkdir /root/06_pki
+mkdir /root/07_tokenization
 
 cd /root
 git clone --single-branch --branch ${GIT_BRANCH} https://github.com/kevincloud/vault-aws-demo.git

@@ -11,7 +11,7 @@ with a CREATE USER / GRANT statement.
 
 vault secrets enable database
 
-vault write database/config/sedemovaultdb \\\\
+vault write database/config/$MYSQL_DBNAME \\\\
     plugin_name="mysql-database-plugin" \\\\
     connection_url="{{username}}:{{password}}@tcp(${MYSQL_HOST})/" \\\\
     allowed_roles="app-role" \\\\
@@ -19,7 +19,7 @@ vault write database/config/sedemovaultdb \\\\
     password="XXXXXXXX"
 
 vault write database/roles/app-role \\\\
-    db_name=sedemovaultdb \\\\
+    db_name=$MYSQL_DBNAME \\\\
     creation_statements="CREATE USER '{{name}}'@'%' IDENTIFIED BY '{{password}}';GRANT SELECT ON *.* TO '{{name}}'@'%';" \\\\
     default_ttl="1h" \\\\
     max_ttl="24h"
@@ -31,7 +31,7 @@ read -n1 kbd
 
 vault secrets enable database > /dev/null
 
-vault write database/config/sedemovaultdb \\
+vault write database/config/$MYSQL_DBNAME \\
     plugin_name="mysql-database-plugin" \\
     connection_url="{{username}}:{{password}}@tcp(${MYSQL_HOST})/" \\
     allowed_roles="app-role" \\
@@ -39,7 +39,7 @@ vault write database/config/sedemovaultdb \\
     password="${DB_PASS}" > /dev/null
 
 vault write database/roles/app-role \\
-    db_name=sedemovaultdb \\
+    db_name=$MYSQL_DBNAME \\
     creation_statements="CREATE USER '{{name}}'@'%' IDENTIFIED BY '{{password}}';GRANT SELECT ON *.* TO '{{name}}'@'%';" \\
     default_ttl="1h" \\
     max_ttl="24h" > /dev/null
@@ -189,7 +189,7 @@ echo "Configuring Dynamic Database Secrets..."
 
 vault secrets enable database > /dev/null
 
-vault write database/config/sedemovaultdb \\
+vault write database/config/$MYSQL_DBNAME \\
     plugin_name="mysql-database-plugin" \\
     connection_url="{{username}}:{{password}}@tcp(${MYSQL_HOST})/" \\
     allowed_roles="app-role" \\
@@ -197,7 +197,7 @@ vault write database/config/sedemovaultdb \\
     password="${DB_PASS}" > /dev/null
 
 vault write database/roles/app-role \\
-    db_name=sedemovaultdb \\
+    db_name=$MYSQL_DBNAME \\
     creation_statements="CREATE USER '{{name}}'@'%' IDENTIFIED BY '{{password}}';GRANT SELECT ON *.* TO '{{name}}'@'%';" \\
     default_ttl="1h" \\
     max_ttl="24h" > /dev/null
