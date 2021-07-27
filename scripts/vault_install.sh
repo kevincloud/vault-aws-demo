@@ -133,7 +133,7 @@ sleep 20
 
 IS_LEADER=$(curl -s http://127.0.0.1:8200/v1/sys/leader | jq -r .is_self)
 
-if [ "$IS_LEADER" == "true" ]; then
+if [ "$IS_LEADER" = "true" ]; then
     # Setup demos
     echo "Setup demos..."
     # UNSEAL_KEY_1=`cat /root/init.txt | sed -n -e '/^Unseal Key 1/ s/.*\: *//p'`
