@@ -17,7 +17,7 @@ resource "aws_instance" "vault-server" {
         MYSQL_HOST = aws_db_instance.vault-mysql.endpoint
         MYSQL_DBNAME = var.mysql_dbname
         POSTGRES_HOST = aws_db_instance.vault-postgres.endpoint
-        POSTGRES_DBNAME = var.postgres_dbname
+        POSTGRES_DBNAME = "${var.prefix}${var.postgres_dbname}"
         DB_USER = var.db_user
         DB_PASS = var.db_pass
         AWS_KMS_KEY_ID = var.kms_key_id
@@ -120,6 +120,7 @@ data "aws_iam_policy_document" "vault-demo" {
       "iam:GetRole",
       "ec2:DescribeInstances",
       "ec2:DescribeTags",
+      "ec2:*",
       "ec2messages:GetMessages",
       "ssm:UpdateInstanceInformation",
       "ssm:ListInstanceAssociations",

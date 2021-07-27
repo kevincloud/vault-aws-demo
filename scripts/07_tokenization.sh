@@ -68,9 +68,9 @@ Finally, we need to create the tokenization engine
 for the role we created. This one will be called
 credit-card.
 
-vault write transform/transformations/tokenization/credit-card \
-    allowed_roles=mobile-pay \
-    max_ttl=24h \
+vault write transform/transformations/tokenization/credit-card \\\\
+    allowed_roles=mobile-pay \\\\
+    max_ttl=24h \\\\
     stores=postgres
 
 Press any key to continue...
@@ -78,9 +78,9 @@ DESCRIPTION
 
 read -n1 kbd
 
-vault write transform/transformations/tokenization/credit-card \
-    allowed_roles=mobile-pay \
-    max_ttl=24h \
+vault write transform/transformations/tokenization/credit-card \\
+    allowed_roles=mobile-pay \\
+    max_ttl=24h \\
     stores=postgres >/dev/null
 
 echo "Configuration complete!"
