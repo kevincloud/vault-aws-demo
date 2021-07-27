@@ -1,6 +1,6 @@
 #!/bin/bash
 
-CURRENT_DIRECTORY="07_tokenization"
+CURRENT_DIRECTORY="08_fpe"
 sudo bash -c "cat >/root/$CURRENT_DIRECTORY/run_interactive.sh" <<EOT
 clear
 cat <<DESCRIPTION
@@ -8,7 +8,7 @@ First we need to enable the transform engine for fpe,
 then create a role which we can use for encrypting
 sensitive information
 
-vault secrets enable transform-fpe
+vault secrets enable -path=transform-fpe transform
 
 vault write transform-fpe/role/payments \\\\
     transformations=credit-card
@@ -18,7 +18,7 @@ DESCRIPTION
 
 read -n1 kbd
 
-vault secrets enable transform-fpe > /dev/null
+vault secrets enable -path=transform-fpe transform > /dev/null
 
 vault write transform-fpe/role/payments \\
   transformations=credit-card > /dev/null
