@@ -108,39 +108,6 @@ echo "select * from tokens" | PGPASSWORD=$DB_PASS psql -h $TOKEN_DB_HOST -d $POS
 EOT
 chmod a+x /root/$CURRENT_DIRECTORY/run_interactive.sh
 
-
-# # enable engine
-# vault secrets enable transform
-
-# # create role
-# vault write transform/role/mobile-pay transformations=credit-card
-
-# create external storage
-# vault write transform/stores/postgres \
-#     type=sql \
-#     driver=postgres \
-#     supported_transformations=tokenization \
-#     connection_string='postgresql://{{username}}:{{password}}@localhost/root?sslmode=disable' \
-#     username=root \
-#     password=SuperSecret1
-#     username=${DB_USER} \
-#     password=${DB_PASS}
-
-# # create schema in database
-# vault write transform/stores/postgres/schema transformation_type=tokenization \
-#     username=root password=SuperSecret1
-#     username=${DB_USER} password=${DB_PASS}
-
-# create tokenization engine
-# vault write transform/transformations/tokenization/credit-card \
-#     allowed_roles=mobile-pay \
-#     max_ttl=24h \
-#     stores=postgres
-
-# psql command:
-# echo "select * from tokens" | PGPASSWORD=SuperSecret1 psql -h kevinctokenizationdb.cjm7z941xa9c.us-east-1.rds.amazonaws.com -d kevinctokenizationdb -U root
-# PGPASSWORD=$DB_PASS psql -h $TOKEN_DB_HOST -d $POSTGRES_DBNAME -U $DB_USER
-
 # create client policy
 sudo bash -c "cat >/root/$CURRENT_DIRECTORY/client_policy.hcl" <<EOT
 # To request data encoding using any of the roles
