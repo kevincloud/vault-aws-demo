@@ -67,9 +67,31 @@ read -n1 kbd
 
 vault write transform-fpe/encode/payments \\
     transformation=credit-card \\
-    value="1234-1234-1234-1234"
+    value="1234-1234-1234-1234" | awk -F ' ' 'NR>2{print $2}' >./current_token.txt
+
+CC_TOKEN=$(cat ./current_token.txt)
+
+echo ""
+echo "The token is: $CC_TOKEN"
 
 read -n1 kbd
+
+clear
+cat <<DESCRIPTION
+And let's decode the token to obtain the original value
+
+vault write transform-fpe/decode/payments \\\\
+    transformation=credit-card \\\\
+    value="XXXXX"
+
+DESCRIPTION
+
+read -n1 kbd
+
+vault write transform-fpe/decode/payments \\
+    transformation=credit-card \\
+    value="$CC_TOKEN"
+
 
 EOT
 chmod a+x /root/$CURRENT_DIRECTORY/run_interactive.sh

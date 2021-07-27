@@ -103,10 +103,35 @@ DESCRIPTION
 
 read -n1 kbd
 
-vault write transform/encode/mobile-pay \\
-    transformation=credit-card \\
-    value="1234-1234-1234-1234"
+vault write transform/encode/mobile-pay \
+    transformation=credit-card \
+    value="1234-1234-1234-1234" | awk -F ' ' 'NR>2{print $2}' >./current_token.txt
 
+CC_TOKEN=$(cat ./current_token.txt)
+
+echo ""
+echo "The token is: $CC_TOKEN"
+
+echo ""
 echo "select * from tokens" | PGPASSWORD=$DB_PASS psql -h $TOKEN_DB_HOST -d $POSTGRES_DBNAME -U $DB_USER
+
+read -n1 kbd
+
+clear
+cat <<DESCRIPTION
+And let's decode the token to obtain the original value
+
+vault write transform/encode/mobile-pay \\\\
+    transformation=credit-card \\\\
+    value="XXXXX"
+
+DESCRIPTION
+
+read -n1 kbd
+
+vault write transform/decode/mobile-pay \\
+    transformation=credit-card \\
+    value="$CC_TOKEN"
+
 EOT
 chmod a+x /root/$CURRENT_DIRECTORY/run_interactive.sh
