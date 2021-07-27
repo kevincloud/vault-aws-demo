@@ -100,11 +100,6 @@ sudo systemctl enable vault
 
 sleep 10
 
-if [ ${NODE_INDEX} -ne 1 ]; then
-    echo "Node configuration complete."
-    exit 1
-fi
-
 echo "Initializing Vault..."
 export VAULT_IP=`curl -s http://169.254.169.254/latest/meta-data/public-ipv4`
 export VAULT_ADDR=http://127.0.0.1:8200
@@ -112,6 +107,17 @@ vault operator init -recovery-shares=1 -recovery-threshold=1 > /root/init.txt 2>
 export VAULT_TOKEN=`cat /root/init.txt | sed -n -e '/^Initial Root Token/ s/.*\: *//p'`
 export DB_HOST=`echo '${MYSQL_HOST}' | awk -F ":" '/1/ {print $1}'`
 export TOKEN_DB_HOST=`echo '${POSTGRES_HOST}' | awk -F ":" '/1/ {print $1}'`
+
+echo "Setting up environment variables..."
+echo "export VAULT_ADDR=http://127.0.0.1:8200" >> /home/ubuntu/.profile
+echo "export VAULT_TOKEN=$VAULT_TOKEN" >> /home/ubuntu/.profile
+echo "export VAULT_ADDR=http://127.0.0.1:8200" >> /root/.profile
+echo "export VAULT_TOKEN=$VAULT_TOKEN" >> /root/.profile
+
+if [ ${NODE_INDEX} -ne 1 ]; then
+    echo "Node configuration complete."
+    exit 1
+fi
 
 export NODE_INDEX=${NODE_INDEX}
 export NUM_NODES=${NUM_NODES}
@@ -136,11 +142,6 @@ IS_LEADER=$(curl -s http://127.0.0.1:8200/v1/sys/leader | jq -r .is_self)
 if [ "$IS_LEADER" = "true" ]; then
     # Setup demos
     echo "Setup demos..."
-    # UNSEAL_KEY_1=`cat /root/init.txt | sed -n -e '/^Unseal Key 1/ s/.*\: *//p'`
-    # UNSEAL_KEY_2=`cat /root/init.txt | sed -n -e '/^Unseal Key 2/ s/.*\: *//p'`
-    # UNSEAL_KEY_3=`cat /root/init.txt | sed -n -e '/^Unseal Key 3/ s/.*\: *//p'`
-    # mkdir /root/01_unseal
-    # mkdir /root/02_cluster
     mkdir /root/03_database
     mkdir /root/04_ec2auth
     mkdir /root/05_eaas
@@ -151,25 +152,12 @@ if [ "$IS_LEADER" = "true" ]; then
     cd /root
     git clone --single-branch --branch ${GIT_BRANCH} https://github.com/kevincloud/vault-aws-demo.git
 
-    # . /root/vault-aws-demo/scripts/01_unseal.sh
-    # . /root/vault-aws-demo/scripts/02_cluster.sh
     . /root/vault-aws-demo/scripts/03_database.sh
     . /root/vault-aws-demo/scripts/04_ec2auth.sh
     . /root/vault-aws-demo/scripts/05_eaas.sh
     . /root/vault-aws-demo/scripts/06_pki.sh
     . /root/vault-aws-demo/scripts/07_tokenization.sh
     . /root/vault-aws-demo/scripts/08_fpe.sh
-
-    echo "Setting up environment variables..."
-    echo "export VAULT_ADDR=http://127.0.0.1:8200" >> /home/ubuntu/.profile
-    echo "export VAULT_TOKEN=$VAULT_TOKEN" >> /home/ubuntu/.profile
-    echo "export VAULT_ADDR=http://127.0.0.1:8200" >> /root/.profile
-    echo "export VAULT_TOKEN=$VAULT_TOKEN" >> /root/.profile
-
-    # echo "Unsealing Vault..."
-    # vault operator unseal $UNSEAL_KEY_1
-    # vault operator unseal $UNSEAL_KEY_2
-    # vault operator unseal $UNSEAL_KEY_3
 
     echo "Wait for cluster to come online..."
     CLUSTER_STATUS=`vault status | grep 'HA Cluster' | sed -rn 's/HA Cluster[ ]*(.*)/\1/p'`
@@ -195,13 +183,6 @@ if [ "$IS_LEADER" = "true" ]; then
         echo "Licensing Vault..."
         vault write sys/license text=${VAULT_LICENSE}
     fi
-
-    # sudo bash -c "cat >/root/unseal" <<EOT
-    # vault operator unseal $UNSEAL_KEY_1 > /dev/null
-    # vault operator unseal $UNSEAL_KEY_2 > /dev/null
-    # vault operator unseal $UNSEAL_KEY_3 > /dev/null
-    # EOT
-    # chmod +x /root/unseal
 
     sudo bash -c "cat >/root/runall.sh" <<EOT
 echo "Configuring Complete Vault..."
