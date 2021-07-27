@@ -2,7 +2,7 @@
 
 CURRENT_DIRECTORY="04_ec2auth"
 # enable ec2 auth
-sudo bash -c "cat >/root/$CURRENT_DIRECTORY/s1_setup_auth.sh" <<EOT
+sudo bash -c "cat >/root/$CURRENT_DIRECTORY/run_interactive.sh" <<EOT
 clear
 cat <<DESCRIPTION
 We're going to configure Vault to integrate with 
@@ -44,9 +44,9 @@ vault write \\
     max_ttl=1h \\
     bound_iam_principal_arn=${ROLE_ARN} > /dev/null
 EOT
-chmod a+x /root/$CURRENT_DIRECTORY/s1_setup_auth.sh
+chmod a+x /root/$CURRENT_DIRECTORY/run_interactive.sh
 
-sudo bash -c "cat >/root/$CURRENT_DIRECTORY/runall.sh" <<EOT
+sudo bash -c "cat >/root/$CURRENT_DIRECTORY/run_auto.sh" <<EOT
 echo "Configuring AWS Authentication..."
 
 vault auth enable aws > /dev/null
@@ -66,4 +66,4 @@ vault write \\
 
 echo "Done."
 EOT
-chmod a+x /root/$CURRENT_DIRECTORY/runall.sh
+chmod a+x /root/$CURRENT_DIRECTORY/run_auto.sh

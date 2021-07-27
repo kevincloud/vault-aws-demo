@@ -52,7 +52,7 @@ EOT
 
 sudo systemctl enable consul-template
 
-sudo bash -c "cat >/root/$CURRENT_DIRECTORY/s1_enable_pki.sh" <<EOT
+sudo bash -c "cat >/root/$CURRENT_DIRECTORY/run_interactive.sh" <<EOT
 clear
 cat <<DESCRIPTION
 We're going to enable a pki engine to for auto-rolling 
@@ -75,10 +75,11 @@ vault secrets enable -path=example_com_pki pki > /dev/null
 vault write -field=certificate \\
     example_com_pki/root/generate/internal \\
     common_name=example.com > /root/$CURRENT_DIRECTORY/ca_cert.crt > /dev/null
-EOT
-chmod a+x /root/$CURRENT_DIRECTORY/s1_enable_pki.sh
 
-sudo bash -c "cat >/root/$CURRENT_DIRECTORY/s2_create_role.sh" <<EOT
+echo "Configuration complete!"
+
+read -n1 kbd
+
 clear
 cat <<DESCRIPTION
 Next, we'll create a role which sets the lease times 
@@ -103,10 +104,11 @@ vault write example_com_pki/roles/web-certs \\
     ttl=5s \\
     max_ttl=30m \\
     generate_lease=true > /dev/null
-EOT
-chmod a+x /root/$CURRENT_DIRECTORY/s2_create_role.sh
 
-sudo bash -c "cat >/root/$CURRENT_DIRECTORY/s3_create_cert.sh" <<EOT
+echo "Configuration complete!"
+
+read -n1 kbd
+
 clear
 cat <<DESCRIPTION
 Now we can create our first certificate. We'll do this using 
@@ -132,10 +134,10 @@ curl -s \\
     --data '{"common_name": "www.example.com" }' \\
     http://localhost:8200/v1/example_com_pki/issue/web-certs | jq -r .data.certificate > www.example.com.crt
 
-EOT
-chmod a+x /root/$CURRENT_DIRECTORY/s3_create_cert.sh
+echo "Configuration complete!"
 
-sudo bash -c "cat >/root/$CURRENT_DIRECTORY/s4_autoroll_cert.sh" <<EOT
+read -n1 kbd
+
 clear
 cat <<DESCRIPTION
 On the client server, we'll use the Vault agent to monitor 
@@ -150,10 +152,13 @@ DESCRIPTION
 read -n1 kbd
 
 service consul-template start
-EOT
-chmod a+x /root/$CURRENT_DIRECTORY/s4_autoroll_cert.sh
 
-sudo bash -c "cat >/root/$CURRENT_DIRECTORY/s5_monitor.sh" <<EOT
+echo "Configuration complete!"
+
+EOT
+chmod a+x /root/$CURRENT_DIRECTORY/run_interactive.sh
+
+sudo bash -c "cat >/root/$CURRENT_DIRECTORY/run_monitor.sh" <<EOT
 #!/bin/bash
 
 while [ 1 ]; do
@@ -162,7 +167,7 @@ while [ 1 ]; do
     sleep 1
 done
 EOT
-chmod a+x /root/$CURRENT_DIRECTORY/s5_monitor.sh
+chmod a+x /root/$CURRENT_DIRECTORY/run_monitor.sh
 
 sudo bash -c "cat >/root/$CURRENT_DIRECTORY/runall.sh" <<EOT
 #!/bin/bash

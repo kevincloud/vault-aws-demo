@@ -2,7 +2,28 @@
 
 CURRENT_DIRECTORY="03_database"
 # Dynamic creds
-sudo bash -c "cat >/root/$CURRENT_DIRECTORY/s1_setup_db.sh" <<EOT
+
+sudo bash -c "cat >/root/$CURRENT_DIRECTORY/operators.hcl" <<EOT
+path "database/roles/*" {
+    capabilities = ["read", "list", "create", "delete", "update"]
+}
+
+path "database/creds/*" {
+    capabilities = ["read", "list", "create", "delete", "update"]
+}
+
+path "secret/*" {
+    capabilities = ["read", "list", "create", "delete", "update"]
+}
+EOT
+
+sudo bash -c "cat >/root/$CURRENT_DIRECTORY/appdevs.hcl" <<EOT
+path "secret/*" {
+    capabilities = ["read", "list"]
+}
+EOT
+
+sudo bash -c "cat >/root/$CURRENT_DIRECTORY/run_interactive.sh" <<EOT
 clear
 cat <<DESCRIPTION
 Let's enable dynamic database secrets and create a role. First, 
@@ -45,30 +66,9 @@ vault write database/roles/app-role \\
     max_ttl="24h" > /dev/null
 
 echo "Configuration complete!"
-EOT
-chmod a+x /root/$CURRENT_DIRECTORY/s1_setup_db.sh
 
-sudo bash -c "cat >/root/$CURRENT_DIRECTORY/operators.hcl" <<EOT
-path "database/roles/*" {
-    capabilities = ["read", "list", "create", "delete", "update"]
-}
+read -n1 kbd
 
-path "database/creds/*" {
-    capabilities = ["read", "list", "create", "delete", "update"]
-}
-
-path "secret/*" {
-    capabilities = ["read", "list", "create", "delete", "update"]
-}
-EOT
-
-sudo bash -c "cat >/root/$CURRENT_DIRECTORY/appdevs.hcl" <<EOT
-path "secret/*" {
-    capabilities = ["read", "list"]
-}
-EOT
-
-sudo bash -c "cat >/root/$CURRENT_DIRECTORY/s2_policies.sh" <<EOT
 clear
 cat <<DESCRIPTION
 Next, we're going to create a couple of policies.
@@ -98,11 +98,11 @@ read -n1 kbd
 
 vault policy write operators /root/$CURRENT_DIRECTORY/operators.hcl > /dev/null
 vault policy write appdevs /root/$CURRENT_DIRECTORY/appdevs.hcl > /dev/null
-echo "Policies added!"
-EOT
-chmod a+x /root/$CURRENT_DIRECTORY/s2_policies.sh
 
-sudo bash -c "cat >/root/$CURRENT_DIRECTORY/s3_users.sh" <<EOT
+echo "Policies added!"
+
+read -n1 kbd
+
 clear
 cat <<DESCRIPTION
 In order to take advantage of those policies, we'll create 
@@ -133,58 +133,60 @@ vault write auth/userpass/users/sally \\
     policies="appdevs" > /dev/null
 
 echo "Users added!"
-EOT
-chmod a+x /root/$CURRENT_DIRECTORY/s3_users.sh
 
-sudo bash -c "cat >/root/$CURRENT_DIRECTORY/s4_james_login.sh" <<EOT
+read -n1 kbd
+
 clear
 cat <<DESCRIPTION
 Let's login as James and see what privileges he has.
 
 vault login --method=userpass username=james
 
+(username is "superpass")
+
 Press any key to continue...
 DESCRIPTION
 
 read -n1 kbd
 
-export OLD_VAULT_TOKEN=$VAULT_TOKEN
+export OLD_VAULT_TOKEN=\$VAULT_TOKEN
 unset VAULT_TOKEN
 
 vault login --method=userpass username=james
 
 vault read database/creds/app-role
 
-export VAULT_TOKEN=$VAULT_TOKEN
+export VAULT_TOKEN=\$OLD_VAULT_TOKEN
 unset OLD_VAULT_TOKEN
-EOT
-chmod a+x /root/$CURRENT_DIRECTORY/s4_james_login.sh
 
-sudo bash -c "cat >/root/$CURRENT_DIRECTORY/s5_sally_login.sh" <<EOT
+read -n1 kbd
+
 clear
 cat <<DESCRIPTION
 Now let's login see if Sally has the same privileges.
 
 vault login --method=userpass username=sally
 
+(username is "superpass")
+
 Press any key to continue...
 DESCRIPTION
 
 read -n1 kbd
 
-export OLD_VAULT_TOKEN=$VAULT_TOKEN
+export OLD_VAULT_TOKEN=\$VAULT_TOKEN
 unset VAULT_TOKEN
 
 vault login --method=userpass username=sally
 
 vault read database/creds/app-role
 
-export VAULT_TOKEN=$VAULT_TOKEN
+export VAULT_TOKEN=\$OLD_VAULT_TOKEN
 unset OLD_VAULT_TOKEN
 EOT
-chmod a+x /root/$CURRENT_DIRECTORY/s5_sally_login.sh
+chmod a+x /root/$CURRENT_DIRECTORY/run_interactive.sh
 
-sudo bash -c "cat >/root/$CURRENT_DIRECTORY/runall.sh" <<EOT
+sudo bash -c "cat >/root/$CURRENT_DIRECTORY/run_auto.sh" <<EOT
 echo "Configuring Dynamic Database Secrets..."
 
 vault secrets enable database > /dev/null
@@ -216,4 +218,4 @@ vault write auth/userpass/users/sally \\
 
 echo "Done."
 EOT
-chmod a+x /root/$CURRENT_DIRECTORY/runall.sh
+chmod a+x /root/$CURRENT_DIRECTORY/run_auto.sh

@@ -67,12 +67,12 @@ read -n1 kbd
 
 vault write transform-fpe/encode/payments \\
     transformation=credit-card \\
-    value="1234-1234-1234-1234" | awk -F ' ' 'NR>2{print $2}' >./current_token.txt
+    value="1234-1234-1234-1234" >./current_token.txt
 
-CC_TOKEN=$(cat ./current_token.txt)
+CC_TOKEN=\$(cat ./current_token.txt | awk -F ' ' 'NR>2{print \$2}')
 
 echo ""
-echo "The token is: $CC_TOKEN"
+echo "The token is: \$CC_TOKEN"
 
 read -n1 kbd
 
@@ -90,8 +90,23 @@ read -n1 kbd
 
 vault write transform-fpe/decode/payments \\
     transformation=credit-card \\
-    value="$CC_TOKEN"
-
+    value="\$CC_TOKEN"
+echo ""
 
 EOT
 chmod a+x /root/$CURRENT_DIRECTORY/run_interactive.sh
+
+sudo bash -c "cat >/root/$CURRENT_DIRECTORY/run_auto.sh" <<EOT
+
+vault secrets enable -path=transform-fpe transform > /dev/null
+
+vault write transform-fpe/role/payments \\
+  transformations=credit-card > /dev/null
+
+vault write transform-fpe/transformations/fpe/credit-card \\
+    template="builtin/creditcardnumber" \\
+    tweak_source=internal \\
+    allowed_roles=payments > /dev/null
+
+EOT
+chmod a+x /root/$CURRENT_DIRECTORY/run_auto.sh
