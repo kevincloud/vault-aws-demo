@@ -35,7 +35,7 @@ vault write transform/stores/postgres \\\\
     type=sql \\\\
     driver=postgres \\\\
     supported_transformations=tokenization \\\\
-    connection_string='postgresql://{{username}}:{{password}}@localhost/root?sslmode=disable' \\\\
+    connection_string='postgresql://{{username}}:{{password}}@mypostgres/mydb?sslmode=disable' \\\\
     username=XXXXX \\\\
     password=XXXXX
 
@@ -51,7 +51,7 @@ vault write transform/stores/postgres \\
     type=sql \\
     driver=postgres \\
     supported_transformations=tokenization \\
-    connection_string='postgresql://{{username}}:{{password}}@localhost/root?sslmode=disable' \\
+    connection_string='postgresql://{{username}}:{{password}}@${TOKEN_DB_HOST}/${POSTGRES_DBNAME}?sslmode=disable' \\
     username=${DB_USER} \\
     password=${DB_PASS} > /dev/null
 
@@ -61,6 +61,8 @@ vault write transform/stores/postgres/schema transformation_type=tokenization \\
 echo "Configuration complete!"
 
 read -n1 kbd
+
+clear
 cat <<DESCRIPTION
 Finally, we need to create the tokenization engine
 for the role we created. This one will be called
@@ -79,11 +81,12 @@ read -n1 kbd
 vault write transform/transformations/tokenization/credit-card \
     allowed_roles=mobile-pay \
     max_ttl=24h \
-    stores=postgres
+    stores=postgres >/dev/null
 
 echo "Configuration complete!"
 
 read -n1 kbd
+
 clear
 cat <<DESCRIPTION
 Now that our configuration is complete, we can 
@@ -107,33 +110,3 @@ vault write transform/encode/mobile-pay \\
 echo "select * from tokens" | PGPASSWORD=$DB_PASS psql -h $TOKEN_DB_HOST -d $POSTGRES_DBNAME -U $DB_USER
 EOT
 chmod a+x /root/$CURRENT_DIRECTORY/run_interactive.sh
-
-# create client policy
-sudo bash -c "cat >/root/$CURRENT_DIRECTORY/client_policy.hcl" <<EOT
-# To request data encoding using any of the roles
-# Specify the role name in the path to narrow down the scope
-path "transform/encode/mobile-pay" {
-   capabilities = [ "update" ]
-}
-
-# To request data decoding using any of the roles
-# Specify the role name in the path to narrow down the scope
-path "transform/decode/mobile-pay" {
-   capabilities = [ "update" ]
-}
-
-# To validate the token
-path "transform/validate/mobile-pay" {
-   capabilities = [ "update" ]
-}
-
-# To retrieve the metadata belong to the token
-path "transform/metadata/mobile-pay" {
-   capabilities = [ "update" ]
-}
-
-# To check and see if the secret is tokenized
-path "transform/tokenized/mobile-pay" {
-   capabilities = [ "update" ]
-}
-EOT
