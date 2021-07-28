@@ -100,6 +100,11 @@ sudo systemctl enable vault
 
 sleep 10
 
+if [ ${NODE_INDEX} -ne 1 ]; then
+    echo "Node configuration complete."
+    exit 1
+fi
+
 echo "Initializing Vault..."
 export VAULT_IP=`curl -s http://169.254.169.254/latest/meta-data/public-ipv4`
 export VAULT_ADDR=http://127.0.0.1:8200
@@ -113,11 +118,6 @@ echo "export VAULT_ADDR=http://127.0.0.1:8200" >> /home/ubuntu/.profile
 echo "export VAULT_TOKEN=$VAULT_TOKEN" >> /home/ubuntu/.profile
 echo "export VAULT_ADDR=http://127.0.0.1:8200" >> /root/.profile
 echo "export VAULT_TOKEN=$VAULT_TOKEN" >> /root/.profile
-
-if [ ${NODE_INDEX} -ne 1 ]; then
-    echo "Node configuration complete."
-    exit 1
-fi
 
 export NODE_INDEX=${NODE_INDEX}
 export NUM_NODES=${NUM_NODES}

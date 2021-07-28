@@ -121,7 +121,6 @@ data "aws_iam_policy_document" "vault-demo" {
       "iam:GetRole",
       "ec2:DescribeInstances",
       "ec2:DescribeTags",
-      "ec2:*",
       "ec2messages:GetMessages",
       "ssm:UpdateInstanceInformation",
       "ssm:ListInstanceAssociations",
