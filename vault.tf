@@ -39,6 +39,7 @@ resource "aws_instance" "vault-server" {
         purpose = var.purpose
         ttl = var.ttl
         terraform = var.terraform
+        var.autojoin_key = var.autojoin_value
     }
 }
 
