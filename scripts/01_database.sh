@@ -34,7 +34,7 @@ vault secrets enable database
 
 vault write database/config/$MYSQL_DBNAME \\\\
     plugin_name="mysql-database-plugin" \\\\
-    connection_url="{{username}}:{{password}}@tcp(${mysqldb.example.com:3306})/" \\\\
+    connection_url="{{username}}:{{password}}@tcp(mysqldb.example.com:3306)/" \\\\
     allowed_roles="app-role" \\\\
     username="XXXXXXXX" \\\\
     password="XXXXXXXX"
