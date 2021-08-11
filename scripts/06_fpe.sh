@@ -1,6 +1,6 @@
 #!/bin/bash
 
-CURRENT_DIRECTORY="08_fpe"
+CURRENT_DIRECTORY="06_fpe"
 sudo bash -c "cat >/root/$CURRENT_DIRECTORY/run_interactive.sh" <<EOT
 clear
 cat <<DESCRIPTION

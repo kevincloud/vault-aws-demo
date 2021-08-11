@@ -162,4 +162,3 @@ resource "aws_db_subnet_group" "vault-db-subnet" {
             terraform = var.terraform
     }
 }
-

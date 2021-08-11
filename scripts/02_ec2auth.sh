@@ -1,6 +1,6 @@
 # ec2 auth
 
-CURRENT_DIRECTORY="04_ec2auth"
+CURRENT_DIRECTORY="02_ec2auth"
 # enable ec2 auth
 sudo bash -c "cat >/root/$CURRENT_DIRECTORY/run_interactive.sh" <<EOT
 clear

@@ -142,22 +142,22 @@ IS_LEADER=$(curl -s http://127.0.0.1:8200/v1/sys/leader | jq -r .is_self)
 if [ "$IS_LEADER" = "true" ]; then
     # Setup demos
     echo "Setup demos..."
-    mkdir /root/03_database
-    mkdir /root/04_ec2auth
-    mkdir /root/05_eaas
-    mkdir /root/06_pki
-    mkdir /root/07_tokenization
-    mkdir /root/08_fpe
+    mkdir /root/01_database
+    mkdir /root/02_ec2auth
+    mkdir /root/03_eaas
+    mkdir /root/04_pki
+    mkdir /root/05_tokenization
+    mkdir /root/06_fpe
 
     cd /root
     git clone --single-branch --branch ${GIT_BRANCH} https://github.com/kevincloud/vault-aws-demo.git
 
-    . /root/vault-aws-demo/scripts/03_database.sh
-    . /root/vault-aws-demo/scripts/04_ec2auth.sh
-    . /root/vault-aws-demo/scripts/05_eaas.sh
-    . /root/vault-aws-demo/scripts/06_pki.sh
-    . /root/vault-aws-demo/scripts/07_tokenization.sh
-    . /root/vault-aws-demo/scripts/08_fpe.sh
+    . /root/vault-aws-demo/scripts/01_database.sh
+    . /root/vault-aws-demo/scripts/02_ec2auth.sh
+    . /root/vault-aws-demo/scripts/03_eaas.sh
+    . /root/vault-aws-demo/scripts/04_pki.sh
+    . /root/vault-aws-demo/scripts/05_tokenization.sh
+    . /root/vault-aws-demo/scripts/06_fpe.sh
 
     echo "Wait for cluster to come online..."
     CLUSTER_STATUS=`vault status | grep 'HA Cluster' | sed -rn 's/HA Cluster[ ]*(.*)/\1/p'`
@@ -186,12 +186,12 @@ if [ "$IS_LEADER" = "true" ]; then
 
     sudo bash -c "cat >/root/runall.sh" <<EOT
 echo "Configuring Complete Vault..."
-# . /root/01_unseal/runall.sh
-# . /root/02_cluster/runall.sh
-. /root/03_database/runall.sh
-. /root/04_ec2auth/runall.sh
-. /root/05_eaas/runall.sh
-. /root/06_pki/runall.sh
+. /root/01_database/runall.sh
+. /root/02_ec2auth/runall.sh
+. /root/03_eaas/runall.sh
+. /root/04_pki/runall.sh
+. /root/05_tokenization/runall.sh
+. /root/06_fpe/runall.sh
 EOT
     chmod a+x /root/runall.sh
 

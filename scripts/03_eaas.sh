@@ -1,6 +1,6 @@
 #!/bin/bash
 
-CURRENT_DIRECTORY="05_eaas"
+CURRENT_DIRECTORY="03_eaas"
 # encryption as a service
 cd /root/$CURRENT_DIRECTORY
 git clone https://github.com/norhe/transit-app-example.git
@@ -119,8 +119,9 @@ mv /root/$CURRENT_DIRECTORY/app/config.ini /root/$CURRENT_DIRECTORY/app/config-z
 mv /root/$CURRENT_DIRECTORY/app/config-x.ini /root/$CURRENT_DIRECTORY/app/config.ini
 
 cd /root/$CURRENT_DIRECTORY/app
-./run
 echo "http://$VAULT_IP:5000/"
+./run
+cd ..
 EOT
 chmod a+x /root/$CURRENT_DIRECTORY/run_interactive.sh
 

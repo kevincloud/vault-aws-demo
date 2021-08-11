@@ -1,6 +1,6 @@
 #!/bin/bash
 
-CURRENT_DIRECTORY="03_database"
+CURRENT_DIRECTORY="01_database"
 # Dynamic creds
 
 sudo bash -c "cat >/root/$CURRENT_DIRECTORY/operators.hcl" <<EOT
@@ -34,7 +34,7 @@ vault secrets enable database
 
 vault write database/config/$MYSQL_DBNAME \\\\
     plugin_name="mysql-database-plugin" \\\\
-    connection_url="{{username}}:{{password}}@tcp(${MYSQL_HOST})/" \\\\
+    connection_url="{{username}}:{{password}}@tcp(${mysqldb.example.com:3306})/" \\\\
     allowed_roles="app-role" \\\\
     username="XXXXXXXX" \\\\
     password="XXXXXXXX"
@@ -142,7 +142,7 @@ Let's login as James and see what privileges he has.
 
 vault login --method=userpass username=james
 
-(username is "superpass")
+(password is "superpass")
 
 Press any key to continue...
 DESCRIPTION
@@ -167,7 +167,7 @@ Now let's login see if Sally has the same privileges.
 
 vault login --method=userpass username=sally
 
-(username is "superpass")
+(password is "superpass")
 
 Press any key to continue...
 DESCRIPTION

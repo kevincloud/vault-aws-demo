@@ -1,6 +1,6 @@
 #!/bin/bash
 
-CURRENT_DIRECTORY="06_pki"
+CURRENT_DIRECTORY="04_pki"
 # pki + consul-template
 curl -sfLo "consul-template.zip" "${CTPL_URL}"
 sudo unzip consul-template.zip -d /usr/local/bin/
@@ -116,7 +116,7 @@ Vault's HTTP API.
 
 curl -s \\\\
     --request POST \\\\
-    --header "X-Vault-Token: $VAULT_TOKEN" \\\\
+    --header "X-Vault-Token: s.0123456789abcdefghijklmn" \\\\
     --data '{"common_name": "www.example.com" }' \\\\
     http://localhost:8200/v1/example_com_pki/issue/web-certs | jq -r .data.certificate > www.example.com.crt
 
@@ -144,7 +144,18 @@ On the client server, we'll use the Vault agent to monitor
 certificate management. Vault agent will need to run as a 
 service.
 
-service consul-template start
+service vault-agent start
+
+And the template Vault agent uses looks like this:
+
+CONFIG.HCL
+----------
+template {
+    contents="{{ with secret \"example_com_pki/issue/web-certs\" \"common_name=www.example.com\" }}{{ .Data.certificate }}{{ end }}"
+    destination="/opt/myapp/www.example.com.crt"
+    perms = 0400
+    # command = "service nginx restart"
+}
 
 Press any key to continue...
 DESCRIPTION
@@ -154,6 +165,18 @@ read -n1 kbd
 service consul-template start
 
 echo "Configuration complete!"
+echo ""
+echo "Press any key to watch cert rotation in real-time..."
+
+read -n1 kbd
+
+while [ 1 ]; do
+    clear
+    echo "Watch the certificate rotate every 5 seconds:"
+    echo ""
+    cat /root/$CURRENT_DIRECTORY/www.example.com.crt
+    sleep 1
+done
 
 EOT
 chmod a+x /root/$CURRENT_DIRECTORY/run_interactive.sh
@@ -163,13 +186,15 @@ sudo bash -c "cat >/root/$CURRENT_DIRECTORY/run_monitor.sh" <<EOT
 
 while [ 1 ]; do
     clear
+    echo "Watch the certificate get rolled every 5 seconds:"
+    echo ""
     cat /root/$CURRENT_DIRECTORY/www.example.com.crt
     sleep 1
 done
 EOT
 chmod a+x /root/$CURRENT_DIRECTORY/run_monitor.sh
 
-sudo bash -c "cat >/root/$CURRENT_DIRECTORY/runall.sh" <<EOT
+sudo bash -c "cat >/root/$CURRENT_DIRECTORY/run_auto.sh" <<EOT
 #!/bin/bash
 
 echo "Configuring PKI..."
@@ -197,5 +222,5 @@ service consul-template start
 
 echo "Done."
 EOT
-chmod a+x /root/$CURRENT_DIRECTORY/runall.sh
+chmod a+x /root/$CURRENT_DIRECTORY/run_auto.sh
 

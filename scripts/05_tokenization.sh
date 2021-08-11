@@ -1,6 +1,6 @@
 #!/bin/bash
 
-CURRENT_DIRECTORY="07_tokenization"
+CURRENT_DIRECTORY="05_tokenization"
 sudo bash -c "cat >/root/$CURRENT_DIRECTORY/run_interactive.sh" <<EOT
 clear
 cat <<DESCRIPTION
