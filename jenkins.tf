@@ -1,13 +1,13 @@
 resource "aws_instance" "jenkins-server" {
     ami = data.aws_ami.ubuntu.id
-    instance_type = var.instance_type
+    instance_type = var.jenkins_inst_type
     key_name = var.key_pair
     iam_instance_profile = aws_iam_instance_profile.jenkins-main-profile.id
     vpc_security_group_ids = [module.jenkinssg.id]
     subnet_id = aws_subnet.public-subnet.id
     private_ip = "10.0.10.201"
     user_data = templatefile("${path.module}/scripts/jenkins_install.sh", {
-        AWS_REGION = "us-west-2",
+        AWS_REGION = var.aws_region,
         ASSET_BUCKET = var.jenkins_bucket,
         TF_ORGNAME = var.tf_org_name,
         TF_WORKSPACE = var.tf_workspace_name

@@ -51,3 +51,5 @@ variable "tf_org_name" { }
 variable "tf_workspace_name" { }
 
 variable "tf_api_token" { }
+
+variable "jenkins_inst_type" { }
