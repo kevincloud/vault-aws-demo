@@ -43,11 +43,11 @@ echo "Get public IP..."
 export PUBLIC_IP=`curl http://169.254.169.254/latest/meta-data/public-ipv4`
 
 echo "Download Jenkins config..."
-aws s3 cp s3://hc-download-assets/jenkins.tgz /var/lib/jenkins/jenkins.tgz
+aws s3 cp s3://hc-download-assets/jenkins-1.tgz /var/lib/jenkins/jenkins.tgz
 
 echo "Configure Jenkins..."
 cd /var/lib/jenkins/
-tar -xvf /var/lib/jenkins/jenkins-1.tgz -C /var/lib/jenkins
+tar -xvf /var/lib/jenkins/jenkins.tgz -C /var/lib/jenkins
 
 sudo bash -c "cat >/var/lib/jenkins/jenkins.model.JenkinsLocationConfiguration.xml" <<EOF
 <?xml version='1.1' encoding='UTF-8'?>
