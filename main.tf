@@ -4,7 +4,7 @@ provider "aws" {
 
 module "jenkinssg" {
     source  = "app.terraform.io/kevindemos/jenkinssg/aws"
-    version = "1.0.5"
+    version = "1.0.6"
 
     aws_region = var.aws_region
     vpcid = aws_vpc.main-vpc.id
