@@ -43,3 +43,11 @@ variable "purpose" { }
 variable "ttl" { }
 
 variable "terraform" { }
+
+variable "jenkins_bucket" { }
+
+variable "tf_org_name" { }
+
+variable "tf_workspace_name" { }
+
+variable "tf_api_token" { }
