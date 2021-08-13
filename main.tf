@@ -7,6 +7,7 @@ module "jenkinssg" {
     version = "1.0.5"
 
     aws_region = var.aws_region
+    vpcid = aws_vpc.main-vpc.id
     prefix = var.prefix
     owner = var.owner
     se-region = var.se-region
