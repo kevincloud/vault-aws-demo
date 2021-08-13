@@ -4,7 +4,7 @@
 # Update apt repo
 #
 echo "Add Jenkins repo..."
-curl -sfLo "/root/jenkins.io.key" https://pkg.jenkins.io/debian/jenkins-ci.org.key
+curl -sfLo "/root/jenkins.io.key" https://pkg.jenkins.io/debian-stable/jenkins.io.key
 sudo apt-key add /root/jenkins.io.key
 sudo sh -c 'echo deb http://pkg.jenkins.io/debian-stable binary/ > /etc/apt/sources.list.d/jenkins.list'
 
@@ -43,7 +43,7 @@ echo "Get public IP..."
 export PUBLIC_IP=`curl http://169.254.169.254/latest/meta-data/public-ipv4`
 
 echo "Download Jenkins config..."
-aws s3 cp s3://hc-downloadable-assets/jenkins.tgz /var/lib/jenkins/jenkins.tgz
+aws s3 cp s3://hc-download-assets/jenkins.tgz /var/lib/jenkins/jenkins.tgz
 
 echo "Configure Jenkins..."
 cd /var/lib/jenkins/
