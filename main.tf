@@ -3,8 +3,14 @@ provider "aws" {
 }
 
 module "jenkinssg" {
-  source  = "app.terraform.io/kevindemos/jenkinssg/aws"
-  version = "1.0.4"
+    source  = "app.terraform.io/kevindemos/jenkinssg/aws"
+    version = "1.0.5"
 
-  aws_region = var.aws_region
+    aws_region = var.aws_region
+    prefix = var.prefix
+    owner = var.owner
+    se-region = var.se-region
+    purpose = var.purpose
+    ttl = var.ttl
+    terraform = var.terraform
 }

@@ -20,7 +20,6 @@ resource "aws_instance" "jenkins-server" {
         purpose = var.purpose
         ttl = var.ttl
         terraform = var.terraform
-        Name = "kevin-jenkins-server"
     }
 }
 
@@ -56,6 +55,15 @@ data "aws_iam_policy_document" "jenkins-main-access-doc" {
 resource "aws_iam_role" "jenkins-main-access-role" {
   name               = "jenkins-access-role"
   assume_role_policy = data.aws_iam_policy_document.jenkins-assume-role.json
+
+    tags = {
+        Name = "${var.prefix}-jenkins-iam-role"
+        owner = var.owner
+        se-region = var.se-region
+        purpose = var.purpose
+        ttl = var.ttl
+        terraform = var.terraform
+    }
 }
 
 resource "aws_iam_role_policy" "jenkins-main-access-policy" {
@@ -67,4 +75,13 @@ resource "aws_iam_role_policy" "jenkins-main-access-policy" {
 resource "aws_iam_instance_profile" "jenkins-main-profile" {
   name = "jenkins-access-profile"
   role = aws_iam_role.jenkins-main-access-role.name
+
+    tags = {
+        Name = "${var.prefix}-jenkins-instance-profile"
+        owner = var.owner
+        se-region = var.se-region
+        purpose = var.purpose
+        ttl = var.ttl
+        terraform = var.terraform
+    }
 }
