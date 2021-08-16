@@ -24,17 +24,21 @@ pip3 install boto3
 pip3 install awscli
 
 sudo bash -c "cat >>/etc/environment" <<EOF
-
+BEARER_TOKEN="${BEARER_TOKEN}"
 ASSET_BUCKET="${ASSET_BUCKET}"
 TF_ORGNAME="${TF_ORGNAME}"
 TF_WORKSPACE="${TF_WORKSPACE}"
+REGION=${AWS_REGION}
+VAULT_IP=${VAULT_IP}
 EOF
 
 sudo bash -c "cat >>/etc/bash.bashrc" <<EOF
-
+BEARER_TOKEN="${BEARER_TOKEN}"
 export ASSET_BUCKET="${ASSET_BUCKET}"
 export TF_ORGNAME="${TF_ORGNAME}"
 export TF_WORKSPACE="${TF_WORKSPACE}"
+export REGION=${AWS_REGION}
+export VAULT_IP=${VAULT_IP}
 EOF
 
 . /etc/bash.bashrc

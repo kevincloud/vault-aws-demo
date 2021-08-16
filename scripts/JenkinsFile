@@ -1,8 +1,29 @@
 #!groovy
 import groovy.json.JsonOutput
 import groovy.json.JsonSlurper
+import com.amazonaws.DefaultRequest
+import com.amazonaws.SignableRequest
+import com.amazonaws.auth.AWS4Signer
+import com.amazonaws.auth.AWSCredentialsProvider
+import com.amazonaws.auth.AWSSecurityTokenService
+import com.amazonaws.http.HttpMethodName
+import com.amazonaws.auth.GetSessionTokenRequest
+import com.amazonaws.auth.GetSessionTokenResult
+import com.amazonaws.auth.AWSSecurityTokenServiceClientBuilder
+import com.amazonaws.auth.AwsClientBuilder
+import org.apache.http.client.utils.URLEncodedUtils
+import org.springframework.http.HttpHeaders
+import org.springframework.http.HttpRequest
 
 def BEARER_TOKEN='asdfasdf'
+
+def vaultresp = httpRequest(
+    customHeaders: [
+            [ name: "Authorization", value: "Bearer " + env.BEARER_TOKEN ], 
+            [ name: "Content-Type", value: "application/vnd.api+json" ]
+        ],
+    url: "https://app.terraform.io/api/v2/organizations/" + env.TF_ORGNAME + "/workspaces/" + env.TF_WORKSPACE
+)
 
 node {
     checkout()
@@ -36,7 +57,7 @@ def putBinary() {
         }
 
         fullPath = env.WORKSPACE + "/target/" + fileName
-        withAWS(credentials:'pipeline-credentials', region: env.REGION) {
+        withAWS(region: env.REGION) {
             s3Upload(bucket: env.ASSET_BUCKET, file: fullPath, path: fileName)
         }
     }
@@ -314,5 +335,79 @@ def getApplyStatus(runid) {
 def mvn(args) {
     withMaven() {
         sh "mvn $args"
+    }
+}
+
+def stuff()
+{
+    // V4RequestSigner signer = new V4RequestSigner()
+    // request = signer.signRequest(request, body)
+    // def data = '{
+    //     "role": "jenkins-role",
+    //     "iam_http_request_method": "'+request.getHttpMethod()+'",
+    //     "iam_request_url": "'+request.getEndPoint()+'",
+    //     "iam_request_body": "'+request.getContent()+'",
+    //     "iam_request_headers": "'+request.getHeaders()+'"
+    // }'
+
+}
+
+class V4RequestSigner {
+    private final String serviceName
+
+    V4RequestSigner() {
+        this.serviceName = "ec2"
+    }
+
+    Credentials getCredentials() {
+        AWSSecurityTokenService sts_client = new AWSSecurityTokenServiceClientBuilder().standard().withEndpointConfiguration(new AwsClientBuilder.EndpointConfiguration("sts-endpoint.amazonaws.com", env.REGION)).build()
+        GetSessionTokenRequest session_token_request = new GetSessionTokenRequest()
+
+        GetSessionTokenResult session_token_result = sts_client.getSessionToken(session_token_request)
+        return session_token_result.getCredentials() 
+    }
+
+    void signRequest(HttpRequest request, byte[] body) {
+        def headers = request.headers
+        if (body == null || body.length == 0) {
+            // Signer wanted the value when zero to be empty-string but Spring's rest template tries to parse it to a Long.  Easier to just remove the header if it exits.
+            headers.keySet().findAll { it.equalsIgnoreCase('Content-Length') }.each { headers.remove(it) }
+
+        }
+        def signableRequest = makeSignableRequest(request, body)
+        headers.clear()
+        headers.putAll(signHeaders(signableRequest))
+    }
+
+
+    HttpHeaders signHeaders(SignableRequest<String> signableRequest) {
+        AWS4Signer signer = new AWS4Signer(false)
+        signer.regionName = env.REGION
+        signer.serviceName = serviceName
+        signer.sign(signableRequest, getCredentials())
+        def headers = new HttpHeaders()
+        signableRequest.headers.each { k, v ->
+            headers.add(k, v)
+        }
+        return headers
+    }
+
+    SignableRequest<String> makeSignableRequest(HttpRequest httpRequest, byte[] bytes) {
+        def request = new DefaultRequest<String>(serviceName)
+
+        // Separate URI base and resource path
+        def uri = httpRequest.URI
+        request.setEndpoint(new URI(uri.scheme, null, uri.host, uri.port, '', '', ''))
+
+        def rawPath = uri.rawPath.replaceAll('\\+', '%2B') // Signer wasn't happy about urls with spaces, wanted all '+' to be encoded as %2B.
+        request.setResourcePath(rawPath)
+        URLEncodedUtils.parse(uri, 'UTF-8').each { nameValue ->
+            request.addParameter(nameValue.name, nameValue.value)
+        }
+
+        request.setHttpMethod(HttpMethodName.valueOf(httpRequest.method.toString()))
+        request.setHeaders(httpRequest.headers.collectEntries { k, v -> [k, v.join(',')] } as Map<String, String>)
+        request.setContent(new ByteArrayInputStream(bytes))
+        return request
     }
 }

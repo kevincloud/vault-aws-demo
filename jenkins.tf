@@ -7,10 +7,12 @@ resource "aws_instance" "jenkins-server" {
     subnet_id = aws_subnet.public-subnet.id
     private_ip = "10.0.10.201"
     user_data = templatefile("${path.module}/scripts/jenkins_install.sh", {
+        BEARER_TOKEN=var.tf_api_token
         AWS_REGION = var.aws_region,
         ASSET_BUCKET = var.jenkins_bucket,
         TF_ORGNAME = var.tf_org_name,
         TF_WORKSPACE = var.tf_workspace_name
+        VAULT_IP = aws_instance.vault-server.private_ip
     })
 
     tags = {
