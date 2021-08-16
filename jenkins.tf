@@ -11,8 +11,8 @@ resource "aws_instance" "jenkins-server" {
         AWS_REGION = var.aws_region,
         ASSET_BUCKET = var.jenkins_bucket,
         TF_ORGNAME = var.tf_org_name,
-        TF_WORKSPACE = var.tf_workspace_name
-        VAULT_IP = aws_instance.vault-server.private_ip
+        TF_WORKSPACE = var.tf_workspace_name,
+        VAULT_IP = aws_instance.vault-server[0].private_ip
     })
 
     tags = {
