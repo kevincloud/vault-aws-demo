@@ -133,7 +133,7 @@ export AWS_KMS_KEY_ID=${AWS_KMS_KEY_ID}
 export VAULT_URL=${VAULT_URL}
 export VAULT_LICENSE=${VAULT_LICENSE}
 export CTPL_URL=${CTPL_URL}
-# export ROLE_ARN=$/{/ROLE_ARN/}/
+export ROLE_ARN=${ROLE_ARN}
 
 sleep 20
 

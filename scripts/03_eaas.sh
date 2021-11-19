@@ -140,5 +140,7 @@ chmod a+x /root/$CURRENT_DIRECTORY/run_auto.sh
 
 sudo bash -c "cat >/root/$CURRENT_DIRECTORY/reset.sh" <<EOT
 vault secrets disable lob_a/workshop/transit > /dev/null
+mv /root/$CURRENT_DIRECTORY/app/config.ini /root/$CURRENT_DIRECTORY/app/config-x.ini
+mv /root/$CURRENT_DIRECTORY/app/config-z.ini /root/$CURRENT_DIRECTORY/app/config.ini
 EOT
 chmod a+x /root/$CURRENT_DIRECTORY/reset.sh

@@ -28,7 +28,7 @@ resource "aws_instance" "vault-server" {
         AUTOJOIN_VALUE = var.autojoin_value
         # TF_API_TOKEN = var.tf_api_token
         # JENKINS_ARN = aws_iam_role.jenkins-main-access-role.arn
-        # ROLE_ARN = aws_iam_role.vault-ec2-allow-demo-role.arn
+        ROLE_ARN = aws_iam_role.vault-ec2-allow-demo-role.arn
     })
     iam_instance_profile = aws_iam_instance_profile.vault-demo.id
     
