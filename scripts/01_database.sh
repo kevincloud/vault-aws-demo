@@ -183,6 +183,9 @@ vault read database/creds/app-role
 
 export VAULT_TOKEN=\$OLD_VAULT_TOKEN
 unset OLD_VAULT_TOKEN
+
+echo "Press any key to continue..."
+read -n1 kbd
 EOT
 chmod a+x /root/$CURRENT_DIRECTORY/run_interactive.sh
 
@@ -219,3 +222,15 @@ vault write auth/userpass/users/sally \\
 echo "Done."
 EOT
 chmod a+x /root/$CURRENT_DIRECTORY/run_auto.sh
+
+sudo bash -c "cat >/root/$CURRENT_DIRECTORY/reset.sh" <<EOT
+# vault delete auth/userpass/users/sally > /dev/null
+# vault delete auth/userpass/users/james > /dev/null
+vault auth disable userpass > /dev/null
+vault policy delete appdevs
+vault policy delete operators
+# vault delete database/roles/app-role
+# vault delete database/config/$MYSQL_DBNAME
+vault secrets disable database > /dev/null
+EOT
+chmod a+x /root/$CURRENT_DIRECTORY/reset.sh

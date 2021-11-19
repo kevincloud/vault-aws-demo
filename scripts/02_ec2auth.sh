@@ -43,6 +43,12 @@ vault write \\
     policies=db-policy \\
     max_ttl=1h \\
     bound_iam_principal_arn=${ROLE_ARN} > /dev/null
+
+echo "Now login to the two EC2 instances to authenticate."
+read -n1 kbd
+echo ""
+echo "Press any key to continue..."
+read -n1 kbd
 EOT
 chmod a+x /root/$CURRENT_DIRECTORY/run_interactive.sh
 

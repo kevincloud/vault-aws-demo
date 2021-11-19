@@ -134,6 +134,8 @@ vault write transform/decode/mobile-pay \\
     value="\$CC_TOKEN"
 echo ""
 
+echo "Press any key to continue..."
+read -n1 kbd
 EOT
 chmod a+x /root/$CURRENT_DIRECTORY/run_interactive.sh
 

@@ -10,7 +10,7 @@ provider "aws" {
 #     vpcid = aws_vpc.main-vpc.id
 #     prefix = var.prefix
 #     owner = var.owner
-#     se-region = var.se-region
+#     se-region = var.se_region
 #     purpose = var.purpose
 #     ttl = var.ttl
 #     terraform = var.terraform

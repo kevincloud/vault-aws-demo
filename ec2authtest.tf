@@ -13,7 +13,7 @@ resource "aws_instance" "vault-ec2-deny" {
     tags = {
         Name = "${var.prefix}-vault-ec2-deny"
         owner = var.owner
-        se-region = var.se-region
+        se-region = var.se_region
         purpose = var.purpose
         ttl = var.ttl
         terraform = var.terraform
@@ -35,7 +35,7 @@ resource "aws_instance" "vault-ec2-allow" {
     tags = {
         Name = "${var.prefix}-vault-ec2-allow"
         owner = var.owner
-        se-region = var.se-region
+        se-region = var.se_region
         purpose = var.purpose
         ttl = var.ttl
         terraform = var.terraform
@@ -63,7 +63,7 @@ resource "aws_security_group" "vault-ec2-sg" {
     
     tags = {
         owner = var.owner
-        se-region = var.se-region
+        se-region = var.se_region
         purpose = var.purpose
         ttl = var.ttl
         terraform = var.terraform
@@ -110,7 +110,7 @@ resource "aws_iam_role" "vault-ec2-deny-demo-role" {
     tags = {
         Name = "${var.prefix}-vault-ec2-deny-iam-role"
         owner = var.owner
-        se-region = var.se-region
+        se-region = var.se_region
         purpose = var.purpose
         ttl = var.ttl
         terraform = var.terraform
@@ -130,7 +130,7 @@ resource "aws_iam_instance_profile" "vault-ec2-deny-demo" {
     tags = {
         Name = "${var.prefix}-vault-ec2-deny-instance-profile"
         owner = var.owner
-        se-region = var.se-region
+        se-region = var.se_region
         purpose = var.purpose
         ttl = var.ttl
         terraform = var.terraform
@@ -148,7 +148,7 @@ resource "aws_iam_role" "vault-ec2-allow-demo-role" {
     tags = {
         Name = "${var.prefix}-vault-ec2-allow-iam-role"
         owner = var.owner
-        se-region = var.se-region
+        se-region = var.se_region
         purpose = var.purpose
         ttl = var.ttl
         terraform = var.terraform
@@ -168,7 +168,7 @@ resource "aws_iam_instance_profile" "vault-ec2-allow-demo" {
     tags = {
         Name = "${var.prefix}-vault-ec2-allow-instance-profile"
         owner = var.owner
-        se-region = var.se-region
+        se-region = var.se_region
         purpose = var.purpose
         ttl = var.ttl
         terraform = var.terraform

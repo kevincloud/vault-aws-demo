@@ -1,48 +1,106 @@
-variable "aws_region" { }
+variable "aws_region" {
+    type = string
+    default = "us-east-1"
+}
 
-variable "key_pair" { }
+variable "key_pair" {
+    type = string
+}
 
-variable "instance_type" { }
+variable "instance_type" {
+    type = string
+    default = "t3.small"
+}
 
-variable "db_instance_type" { }
+variable "db_instance_type" {
+    type = string
+    default = "t3.small"
+}
 
-variable "num_nodes" { }
+variable "num_nodes" {
+    type = number
+    default = 1
+}
 
-variable "db_pass" { }
+variable "db_user" {
+    type = string
+    default = "root"
+}
 
-variable "db_user" { }
+variable "db_pass" {
+    type = string
+}
 
-variable "mysql_dbname" { }
+variable "mysql_dbname" {
+    type = string
+    default = "sedemovaultdb"
+}
 
-variable "postgres_dbname" { }
+variable "postgres_dbname" {
+    type = string
+    default = "tokenizationdb"
+}
 
-variable "kms_key_id" { }
+variable "kms_key_id" {
+    type = string
+}
 
-variable "vault_dl_url" { }
+variable "vault_dl_url" {
+    type = string
+    default = "https://releases.hashicorp.com/vault/1.9.0/vault_1.9.0_linux_amd64.zip"
+}
 
-variable "vault_license" { }
+variable "vault_license" {
+    type = string
+    default = ""
+}
 
-variable "consul_tpl_url" { }
+variable "consul_tpl_url" {
+    type = string
+    description = "Consul template is somewhat legacy, but still works perfectly. It will be migrated to Vault templating in the future."
+    default = "https://releases.hashicorp.com/consul-template/0.27.2/consul-template_0.27.2_linux_amd64.zip"
+}
 
-variable "autojoin_key" { }
+variable "autojoin_key" {
+    type = string
+    default = "vault_server_cluster"
+}
 
-variable "autojoin_value" { }
+variable "autojoin_value" {
+    type = string
+    default = "vault_raft"
+}
 
-variable "auto_unseal" { }
+variable "prefix" {
+    type = string
+}
 
-variable "prefix" { }
+variable "git_branch" {
+    type = string
+    value = "master"
+}
 
-variable "git_branch" { }
+variable "owner" {
+    type = string
+}
 
-variable "owner" { }
+variable "se_region" {
+    type = string
+}
 
-variable "se-region" { }
+variable "purpose" {
+    type = string
+    default = "Demonstrate the power of Vault"
+}
 
-variable "purpose" { }
+variable "ttl" {
+    type = string
+}
 
-variable "ttl" { }
-
-variable "terraform" { }
+variable "terraform" {
+    type = bool
+    value = true
+}
 
 # variable "jenkins_bucket" { }
 

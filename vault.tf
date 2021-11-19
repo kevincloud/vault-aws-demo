@@ -11,7 +11,6 @@ resource "aws_instance" "vault-server" {
     user_data = templatefile("${path.module}/scripts/vault_install.sh", {
         NODE_INDEX = count.index + 1
         NUM_NODES = var.num_nodes
-        AUTO_UNSEAL = var.auto_unseal
         AMI_ID = data.aws_ami.ubuntu.id
         AWS_REGION = var.aws_region
         MYSQL_HOST = aws_db_instance.vault-mysql.endpoint
@@ -37,7 +36,7 @@ resource "aws_instance" "vault-server" {
         Name = "${var.prefix}-vault-unseal-demo-${count.index}"
         NodeID = "Node${count.index + 1}"
         owner = var.owner
-        se-region = var.se-region
+        se-region = var.se_region
         purpose = var.purpose
         ttl = var.ttl
         terraform = var.terraform
@@ -94,7 +93,7 @@ resource "aws_security_group" "vault-server-sg" {
     
     tags = {
         owner = var.owner
-        se-region = var.se-region
+        se-region = var.se_region
         purpose = var.purpose
         ttl = var.ttl
         terraform = var.terraform
@@ -143,7 +142,7 @@ resource "aws_iam_role" "vault-demo-role" {
     tags = {
         Name = "${var.prefix}-vault-iam-role"
         owner = var.owner
-        se-region = var.se-region
+        se-region = var.se_region
         purpose = var.purpose
         ttl = var.ttl
         terraform = var.terraform
@@ -163,7 +162,7 @@ resource "aws_iam_instance_profile" "vault-demo" {
     tags = {
         Name = "${var.prefix}-vault-instance-profile"
         owner = var.owner
-        se-region = var.se-region
+        se-region = var.se_region
         purpose = var.purpose
         ttl = var.ttl
         terraform = var.terraform

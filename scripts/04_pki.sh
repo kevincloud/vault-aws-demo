@@ -173,11 +173,14 @@ read -n1 kbd
 while [ 1 ]; do
     clear
     echo "Watch the certificate rotate every 5 seconds:"
+    echo "(Press CTRL+C to stop rotation)"
     echo ""
     cat /root/$CURRENT_DIRECTORY/www.example.com.crt
     sleep 1
 done
 
+echo "Press any key to continue..."
+read -n1 kbd
 EOT
 chmod a+x /root/$CURRENT_DIRECTORY/run_interactive.sh
 

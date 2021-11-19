@@ -122,6 +122,8 @@ cd /root/$CURRENT_DIRECTORY/app
 echo "http://$VAULT_IP:5000/"
 ./run
 cd ..
+echo "Press any key to continue..."
+read -n1 kbd
 EOT
 chmod a+x /root/$CURRENT_DIRECTORY/run_interactive.sh
 

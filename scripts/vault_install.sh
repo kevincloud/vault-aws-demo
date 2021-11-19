@@ -184,14 +184,61 @@ if [ "$IS_LEADER" = "true" ]; then
         vault write sys/license text=${VAULT_LICENSE}
     fi
 
+    echo "Configuring Complete Vault..."
     sudo bash -c "cat >/root/runall.sh" <<EOT
-echo "Configuring Complete Vault..."
-. /root/01_database/runall.sh
-. /root/02_ec2auth/runall.sh
-. /root/03_eaas/runall.sh
-. /root/04_pki/runall.sh
-. /root/05_tokenization/runall.sh
-. /root/06_fpe/runall.sh
+clear
+echo -e "\n\n\n\n\n\n\n\n"
+echo "                    ****************************************"
+echo "                    * Part 1: Dynamic Database Secrets     *"
+echo "                    ****************************************"
+read -n1 kbd
+clear
+. /root/01_database/run_interactive.sh
+
+clear
+echo -e "\n\n\n\n\n\n\n\n"
+echo "                    ****************************************"
+echo "                    * Part 2: AWS IAM Authentication       *"
+echo "                    ****************************************"
+read -n1 kbd
+clear
+. /root/02_ec2auth/run_interactive.sh
+
+clear
+echo -e "\n\n\n\n\n\n\n\n"
+echo "                    ****************************************"
+echo "                    * Part 3: Encryption as a Service      *"
+echo "                    ****************************************"
+read -n1 kbd
+clear
+. /root/03_eaas/run_interactive.sh
+
+clear
+echo -e "\n\n\n\n\n\n\n\n"
+echo "                    ****************************************"
+echo "                    * Part 4: PKI Automated Rotation       *"
+echo "                    ****************************************"
+read -n1 kbd
+clear
+. /root/04_pki/run_interactive.sh
+
+clear
+echo -e "\n\n\n\n\n\n\n\n"
+echo "                    ****************************************"
+echo "                    * Part 5: Tokenization with PostgreSQL *"
+echo "                    ****************************************"
+read -n1 kbd
+clear
+. /root/05_tokenization/run_interactive.sh
+
+clear
+echo -e "\n\n\n\n\n\n\n\n"
+echo "                    ****************************************"
+echo "                    * Part 6: Format-Preserving Encryption *"
+echo "                    ****************************************"
+read -n1 kbd
+clear
+. /root/06_fpe/run_interactive.sh
 EOT
     chmod a+x /root/runall.sh
 
@@ -202,9 +249,6 @@ EOT
         --data '{"data": { "username": "vault_user", "password": "Super$ecret1" } }' \
         http://127.0.0.1:8200/v1/secret/data/creds
 
-    # if [ "${AUTO_UNSEAL}" = "on" ]; then
-    #     /root/01_unseal/runall.sh
-    # fi
 
     #### Uncomment the rest for integrating Jenkins
     # vault secrets enable -path="jenkins" -version=2 kv

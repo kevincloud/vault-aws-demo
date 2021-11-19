@@ -5,7 +5,7 @@ resource "aws_vpc" "main-vpc" {
     tags = {
         Name = "vault-aws-vpc-${var.prefix}"
         owner = var.owner
-        se-region = var.se-region
+        se-region = var.se_region
         purpose = var.purpose
         ttl = var.ttl
         terraform = var.terraform
@@ -18,7 +18,7 @@ resource "aws_internet_gateway" "igw" {
     tags = {
         Name = "vault-aws-igw-${var.prefix}"
         owner = var.owner
-        se-region = var.se-region
+        se-region = var.se_region
         purpose = var.purpose
         ttl = var.ttl
         terraform = var.terraform
@@ -35,7 +35,7 @@ resource "aws_subnet" "public-subnet" {
     tags = {
         Name = "vault-aws-public-${var.prefix}"
         owner = var.owner
-        se-region = var.se-region
+        se-region = var.se_region
         purpose = var.purpose
         ttl = var.ttl
         terraform = var.terraform
@@ -52,7 +52,7 @@ resource "aws_subnet" "public-subnet-2" {
     tags = {
         Name = "vault-aws-public-${var.prefix}"
         owner = var.owner
-        se-region = var.se-region
+        se-region = var.se_region
         purpose = var.purpose
         ttl = var.ttl
         terraform = var.terraform
@@ -69,7 +69,7 @@ resource "aws_subnet" "public-subnet-2" {
 #         Name = "jp-k8s-private-subnet-${count.index}-${var.prefix}"
 #         "kubernetes.io/cluster/javaperks" = "owned"
 #         owner = var.owner
-#         se-region = var.se-region
+#         se-region = var.se_region
 #         purpose = var.purpose
 #         ttl = var.ttl
 #         terraform = var.terraform
@@ -88,7 +88,7 @@ resource "aws_eip" "nat-ip" {
     tags = {
         Name = "vault-aws-eip-${var.prefix}"
         owner = var.owner
-        se-region = var.se-region
+        se-region = var.se_region
         purpose = var.purpose
         ttl = var.ttl
         terraform = var.terraform
@@ -103,7 +103,7 @@ resource "aws_nat_gateway" "natgw" {
     tags = {
         Name = "jp-k8s-natgw-${var.prefix}"
         owner = var.owner
-        se-region = var.se-region
+        se-region = var.se_region
         purpose = var.purpose
         ttl = var.ttl
         terraform = var.terraform
@@ -120,7 +120,7 @@ resource "aws_route_table" "natgw-route" {
     tags = {
         Name = "vault-aws-natgw-route-${var.prefix}"
         owner = var.owner
-        se-region = var.se-region
+        se-region = var.se_region
         purpose = var.purpose
         ttl = var.ttl
         terraform = var.terraform
@@ -137,7 +137,7 @@ resource "aws_route_table" "igw-route" {
     tags = {
         Name = "vault-aws-igw-route-${var.prefix}"
         owner = var.owner
-        se-region = var.se-region
+        se-region = var.se_region
         purpose = var.purpose
         ttl = var.ttl
         terraform = var.terraform
@@ -156,7 +156,7 @@ resource "aws_db_subnet_group" "vault-db-subnet" {
     tags = {
         Name = "Vault DB subnet group"
             owner = var.owner
-            se-region = var.se-region
+            se-region = var.se_region
             purpose = var.purpose
             ttl = var.ttl
             terraform = var.terraform

@@ -16,7 +16,7 @@ resource "aws_db_instance" "vault-postgres" {
     tags = {
         Name = "${var.prefix}-vault-postgres"
         owner = var.owner
-        se-region = var.se-region
+        se-region = var.se_region
         purpose = var.purpose
         ttl = var.ttl
         terraform = var.terraform
@@ -34,7 +34,7 @@ resource "aws_db_parameter_group" "postgres-params" {
 
     tags = {
         owner = var.owner
-        se-region = var.se-region
+        se-region = var.se_region
         purpose = var.purpose
         ttl = var.ttl
         terraform = var.terraform
@@ -62,7 +62,7 @@ resource "aws_security_group" "vault-postgres-sg" {
     
     tags = {
         owner = var.owner
-        se-region = var.se-region
+        se-region = var.se_region
         purpose = var.purpose
         ttl = var.ttl
         terraform = var.terraform
