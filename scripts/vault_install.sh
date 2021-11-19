@@ -133,7 +133,7 @@ export AWS_KMS_KEY_ID=${AWS_KMS_KEY_ID}
 export VAULT_URL=${VAULT_URL}
 export VAULT_LICENSE=${VAULT_LICENSE}
 export CTPL_URL=${CTPL_URL}
-export ROLE_ARN=${ROLE_ARN}
+# export ROLE_ARN=$/{/ROLE_ARN/}/
 
 sleep 20
 
@@ -206,23 +206,24 @@ EOT
     #     /root/01_unseal/runall.sh
     # fi
 
-    vault secrets enable -path="jenkins" -version=2 kv
-    vault kv put jenkins/tfdata tftoken="${TF_API_TOKEN}"
+    #### Uncomment the rest for integrating Jenkins
+    # vault secrets enable -path="jenkins" -version=2 kv
+    # vault kv put jenkins/tfdata tftoken="$/{/TF_API_TOKEN/}/"
 
-    vault auth enable -path="jenkinsauth-aws" aws > /dev/null
+    # vault auth enable -path="jenkinsauth-aws" aws > /dev/null
 
-    vault policy write "jenkins-policy" > /dev/null -<<EOF
-path "jenkins/*" {
-    capabilities = ["list", "read"]
-}
-EOF
+    # vault policy write "jenkins-policy" > /dev/null -<<EOF
+# path "jenkins/*" {
+#     capabilities = ["list", "read"]
+# }
+# EOF
 
-    vault write \
-        auth/aws/role/jenkins-role \
-        auth_type=iam \
-        policies=jenkins-policy \
-        max_ttl=7d \
-        bound_iam_principal_arn=${JENKINS_ARN} > /dev/null
+    # vault write \
+    #     auth/aws/role/jenkins-role \
+    #     auth_type=iam \
+    #     policies=jenkins-policy \
+    #     max_ttl=7d \
+    #     bound_iam_principal_arn=$/{/JENKINS_ARN/}/ > /dev/null
 fi
 
 echo "Vault installation complete."

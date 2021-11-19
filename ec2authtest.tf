@@ -127,14 +127,14 @@ resource "aws_iam_instance_profile" "vault-ec2-deny-demo" {
     name = "${var.prefix}-vault-ec2-deny-demo"
     role = aws_iam_role.vault-ec2-deny-demo-role.name
     
-    tags = {
-        Name = "${var.prefix}-vault-ec2-deny-instance-profile"
-        owner = var.owner
-        se-region = var.se-region
-        purpose = var.purpose
-        ttl = var.ttl
-        terraform = var.terraform
-    }
+    # tags = {
+    #     Name = "${var.prefix}-vault-ec2-deny-instance-profile"
+    #     owner = var.owner
+    #     se-region = var.se-region
+    #     purpose = var.purpose
+    #     ttl = var.ttl
+    #     terraform = var.terraform
+    # }
 }
 
 ###
@@ -165,12 +165,12 @@ resource "aws_iam_instance_profile" "vault-ec2-allow-demo" {
     name = "${var.prefix}-vault-ec2-allow-demo"
     role = aws_iam_role.vault-ec2-allow-demo-role.name
     
-    tags = {
-        Name = "${var.prefix}-vault-ec2-allow-instance-profile"
-        owner = var.owner
-        se-region = var.se-region
-        purpose = var.purpose
-        ttl = var.ttl
-        terraform = var.terraform
-    }
+    # tags = {
+    #     Name = "${var.prefix}-vault-ec2-allow-instance-profile"
+    #     owner = var.owner
+    #     se-region = var.se-region
+    #     purpose = var.purpose
+    #     ttl = var.ttl
+    #     terraform = var.terraform
+    # }
 }

@@ -7,11 +7,11 @@ terraform {
     }
   }
 
-  backend "remote" {
-    organization = "kevindemos"
+  # backend "remote" {
+  #   organization = "kevindemos"
 
-    workspaces {
-      name = "vault-aws-demo"
-    }
-  }
+  #   workspaces {
+  #     name = "vault-aws-demo"
+  #   }
+  # }
 }

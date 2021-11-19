@@ -50,7 +50,6 @@ def generate_vault_request(awsIamServerId):
 
     request_dict['headers']['X-Vault-AWS-IAM-Server-ID'] = awsIamServerId
 
-    //  AWSPreparedRequest
     request = endpoint.create_request(request_dict, operation_model)
 
     return {

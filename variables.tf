@@ -44,12 +44,12 @@ variable "ttl" { }
 
 variable "terraform" { }
 
-variable "jenkins_bucket" { }
+# variable "jenkins_bucket" { }
 
-variable "tf_org_name" { }
+# variable "tf_org_name" { }
 
-variable "tf_workspace_name" { }
+# variable "tf_workspace_name" { }
 
-variable "tf_api_token" { }
+# variable "tf_api_token" { }
 
-variable "jenkins_inst_type" { }
+# variable "jenkins_inst_type" { }

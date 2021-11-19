@@ -27,9 +27,9 @@ resource "aws_instance" "vault-server" {
         GIT_BRANCH = var.git_branch
         AUTOJOIN_KEY = var.autojoin_key
         AUTOJOIN_VALUE = var.autojoin_value
-        TF_API_TOKEN = var.tf_api_token
-        JENKINS_ARN = aws_iam_role.jenkins-main-access-role.arn
-        ROLE_ARN = aws_iam_role.vault-ec2-allow-demo-role.arn
+        # TF_API_TOKEN = var.tf_api_token
+        # JENKINS_ARN = aws_iam_role.jenkins-main-access-role.arn
+        # ROLE_ARN = aws_iam_role.vault-ec2-allow-demo-role.arn
     })
     iam_instance_profile = aws_iam_instance_profile.vault-demo.id
     
@@ -160,12 +160,12 @@ resource "aws_iam_instance_profile" "vault-demo" {
     name = "${var.prefix}-vault-demo"
     role = aws_iam_role.vault-demo-role.name
     
-    tags = {
-        Name = "${var.prefix}-vault-instance-profile"
-        owner = var.owner
-        se-region = var.se-region
-        purpose = var.purpose
-        ttl = var.ttl
-        terraform = var.terraform
-    }
+    # tags = {
+    #     Name = "${var.prefix}-vault-instance-profile"
+    #     owner = var.owner
+    #     se-region = var.se-region
+    #     purpose = var.purpose
+    #     ttl = var.ttl
+    #     terraform = var.terraform
+    # }
 }
