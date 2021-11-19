@@ -77,7 +77,7 @@ variable "prefix" {
 
 variable "git_branch" {
     type = string
-    value = "master"
+    default = "master"
 }
 
 variable "owner" {
@@ -99,7 +99,7 @@ variable "ttl" {
 
 variable "terraform" {
     type = bool
-    value = true
+    default = true
 }
 
 # variable "jenkins_bucket" { }
