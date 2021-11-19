@@ -160,12 +160,12 @@ resource "aws_iam_instance_profile" "vault-demo" {
     name = "${var.prefix}-vault-demo"
     role = aws_iam_role.vault-demo-role.name
     
-    # tags = {
-    #     Name = "${var.prefix}-vault-instance-profile"
-    #     owner = var.owner
-    #     se-region = var.se-region
-    #     purpose = var.purpose
-    #     ttl = var.ttl
-    #     terraform = var.terraform
-    # }
+    tags = {
+        Name = "${var.prefix}-vault-instance-profile"
+        owner = var.owner
+        se-region = var.se-region
+        purpose = var.purpose
+        ttl = var.ttl
+        terraform = var.terraform
+    }
 }
