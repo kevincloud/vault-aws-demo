@@ -112,3 +112,8 @@ vault write transform-fpe/transformations/fpe/credit-card \\
 
 EOT
 chmod a+x /root/$CURRENT_DIRECTORY/run_auto.sh
+
+sudo bash -c "cat >/root/$CURRENT_DIRECTORY/reset.sh" <<EOT
+vault secrets disable transform-fpe > /dev/null
+EOT
+chmod a+x /root/$CURRENT_DIRECTORY/reset.sh

@@ -216,16 +216,7 @@ clear
 clear
 echo -e "\n\n\n\n\n\n\n\n"
 echo "                    ****************************************"
-echo "                    * Part 4: PKI Automated Rotation       *"
-echo "                    ****************************************"
-read -n1 kbd
-clear
-. /root/04_pki/run_interactive.sh
-
-clear
-echo -e "\n\n\n\n\n\n\n\n"
-echo "                    ****************************************"
-echo "                    * Part 5: Tokenization with PostgreSQL *"
+echo "                    * Part 4: Tokenization with PostgreSQL *"
 echo "                    ****************************************"
 read -n1 kbd
 clear
@@ -234,13 +225,34 @@ clear
 clear
 echo -e "\n\n\n\n\n\n\n\n"
 echo "                    ****************************************"
-echo "                    * Part 6: Format-Preserving Encryption *"
+echo "                    * Part 5: Format-Preserving Encryption *"
 echo "                    ****************************************"
 read -n1 kbd
 clear
 . /root/06_fpe/run_interactive.sh
+
+clear
+echo -e "\n\n\n\n\n\n\n\n"
+echo "                    ****************************************"
+echo "                    * Part 6: PKI Automated Rotation       *"
+echo "                    ****************************************"
+read -n1 kbd
+clear
+. /root/04_pki/run_interactive.sh
 EOT
     chmod a+x /root/runall.sh
+
+    sudo bash -c "cat >/root/resetall.sh" <<EOT
+echo "Resetting all configurations..."
+. /root/01_database/reset.sh
+. /root/02_ec2auth/reset.sh
+. /root/03_eaas/reset.sh
+. /root/04_pki/reset.sh
+. /root/05_tokenization/reset.sh
+. /root/06_fpe/reset.sh
+echo "Done."
+EOT
+    chmod a+x /root/resetall.sh
 
     # Add our AWS secrets
     curl \

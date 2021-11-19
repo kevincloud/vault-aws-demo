@@ -224,13 +224,9 @@ EOT
 chmod a+x /root/$CURRENT_DIRECTORY/run_auto.sh
 
 sudo bash -c "cat >/root/$CURRENT_DIRECTORY/reset.sh" <<EOT
-# vault delete auth/userpass/users/sally > /dev/null
-# vault delete auth/userpass/users/james > /dev/null
 vault auth disable userpass > /dev/null
-vault policy delete appdevs
-vault policy delete operators
-# vault delete database/roles/app-role
-# vault delete database/config/$MYSQL_DBNAME
+vault policy delete appdevs > /dev/null
+vault policy delete operators > /dev/null
 vault secrets disable database > /dev/null
 EOT
 chmod a+x /root/$CURRENT_DIRECTORY/reset.sh

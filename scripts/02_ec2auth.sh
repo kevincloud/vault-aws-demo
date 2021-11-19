@@ -73,3 +73,9 @@ vault write \\
 echo "Done."
 EOT
 chmod a+x /root/$CURRENT_DIRECTORY/run_auto.sh
+
+sudo bash -c "cat >/root/$CURRENT_DIRECTORY/reset.sh" <<EOT
+vault policy delete "db-policy" > /dev/null
+vault auth disable aws > /dev/null
+EOT
+chmod a+x /root/$CURRENT_DIRECTORY/reset.sh

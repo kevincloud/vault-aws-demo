@@ -132,7 +132,7 @@ curl -s \\
     --request POST \\
     --header "X-Vault-Token: $VAULT_TOKEN" \\
     --data '{"common_name": "www.example.com" }' \\
-    http://localhost:8200/v1/example_com_pki/issue/web-certs | jq -r .data.certificate > www.example.com.crt
+    http://localhost:8200/v1/example_com_pki/issue/web-certs | jq -r .data.certificate > /root/$CURRENT_DIRECTORY/www.example.com.crt
 
 echo "Configuration complete!"
 
@@ -219,11 +219,21 @@ curl -s \\
     --request POST \\
     --header "X-Vault-Token: $VAULT_TOKEN" \\
     --data '{"common_name": "www.example.com" }' \\
-    http://localhost:8200/v1/example_com_pki/issue/web-certs | jq -r .data.certificate > www.example.com.crt
+    http://localhost:8200/v1/example_com_pki/issue/web-certs | jq -r .data.certificate > /root/$CURRENT_DIRECTORY/www.example.com.crt
 
 service consul-template start
 
 echo "Done."
 EOT
 chmod a+x /root/$CURRENT_DIRECTORY/run_auto.sh
+
+sudo bash -c "cat >/root/$CURRENT_DIRECTORY/reset.sh" <<EOT
+#!/bin/bash
+
+service consul-template stop
+vault secrets disable example_com_pki > /dev/null
+rm /root/$CURRENT_DIRECTORY/ca_cert.crt
+rm /root/$CURRENT_DIRECTORY/www.example.com.crt
+EOT
+chmod a+x /root/$CURRENT_DIRECTORY/reset.sh
 

@@ -162,3 +162,10 @@ vault write transform/transformations/tokenization/credit-card \\
 
 EOT
 chmod a+x /root/$CURRENT_DIRECTORY/run_auto.sh
+
+sudo bash -c "cat >/root/$CURRENT_DIRECTORY/reset.sh" <<EOT
+vault secrets disable transform > /dev/null
+service vault restart
+# echo "drop database $POSTGRES_DBNAME" | PGPASSWORD=$DB_PASS psql -h $TOKEN_DB_HOST -d postgres -U $DB_USER
+EOT
+chmod a+x /root/$CURRENT_DIRECTORY/reset.sh
