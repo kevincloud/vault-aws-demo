@@ -36,8 +36,8 @@ sudo unzip vault.zip -d /usr/local/bin/
 sudo setcap cap_ipc_lock=+ep /usr/local/bin/vault
 
 sudo tee -a /etc/environment <<EOF
-export VAULT_ADDR=http://127.0.0.1:8200
-export VAULT_SKIP_VERIFY=true
+VAULT_ADDR=http://127.0.0.1:8200
+VAULT_SKIP_VERIFY=true
 EOF
 
 . /etc/environment
@@ -116,8 +116,12 @@ export TOKEN_DB_HOST=`echo '${POSTGRES_HOST}' | awk -F ":" '/1/ {print $1}'`
 echo "Setting up environment variables..."
 echo "export VAULT_ADDR=http://127.0.0.1:8200" >> /home/ubuntu/.profile
 echo "export VAULT_TOKEN=$VAULT_TOKEN" >> /home/ubuntu/.profile
+echo "export VAULT_LICENSE=${VAULT_LICENSE}" >> /home/ubuntu/.profile
 echo "export VAULT_ADDR=http://127.0.0.1:8200" >> /root/.profile
 echo "export VAULT_TOKEN=$VAULT_TOKEN" >> /root/.profile
+echo "export VAULT_LICENSE=${VAULT_LICENSE}" >> /root/.profile
+echo "VAULT_TOKEN=$VAULT_TOKEN" >> /etc/environment
+echo "VAULT_LICENSE=${VAULT_LICENSE}" >> /etc/environment
 
 export NODE_INDEX=${NODE_INDEX}
 export NUM_NODES=${NUM_NODES}
