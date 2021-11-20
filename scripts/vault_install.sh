@@ -38,10 +38,11 @@ sudo setcap cap_ipc_lock=+ep /usr/local/bin/vault
 sudo tee -a /etc/environment <<EOF
 VAULT_ADDR=http://127.0.0.1:8200
 VAULT_SKIP_VERIFY=true
-VAULT_LICENSE=${VAULT_LICENSE}
 EOF
 
 . /etc/environment
+
+echo "${VAULT_LICENSE}" > /etc/vault.d/license.hclic
 
 # Server configuration
 sudo bash -c "cat >/etc/vault.d/vault.hcl" <<EOT
@@ -54,6 +55,7 @@ storage "raft" {
   }
 }
 
+license_path = "/etc/vault.d/license.hclic"
 listener "tcp" {
   address     = "0.0.0.0:8200"
   cluster_address = "0.0.0.0:8201"
@@ -117,10 +119,8 @@ export TOKEN_DB_HOST=`echo '${POSTGRES_HOST}' | awk -F ":" '/1/ {print $1}'`
 echo "Setting up environment variables..."
 echo "export VAULT_ADDR=http://127.0.0.1:8200" >> /home/ubuntu/.profile
 echo "export VAULT_TOKEN=$VAULT_TOKEN" >> /home/ubuntu/.profile
-echo "export VAULT_LICENSE=${VAULT_LICENSE}" >> /home/ubuntu/.profile
 echo "export VAULT_ADDR=http://127.0.0.1:8200" >> /root/.profile
 echo "export VAULT_TOKEN=$VAULT_TOKEN" >> /root/.profile
-echo "export VAULT_LICENSE=${VAULT_LICENSE}" >> /root/.profile
 echo "VAULT_TOKEN=$VAULT_TOKEN" >> /etc/environment
 
 export NODE_INDEX=${NODE_INDEX}
@@ -183,10 +183,10 @@ if [ "$IS_LEADER" = "true" ]; then
     echo "Enable audit logging..."
     vault audit enable file file_path=/var/log/vault_audit.log
 
-    if [ ${NODE_INDEX} -eq 1 ]; then
-        echo "Licensing Vault..."
-        vault write sys/license text=${VAULT_LICENSE}
-    fi
+    # if [ ${NODE_INDEX} -eq 1 ]; then
+    #     echo "Licensing Vault..."
+    #     vault write sys/license text=${VAULT_LICENSE}
+    # fi
 
     echo "Configuring Complete Vault..."
     sudo bash -c "cat >/root/runall.sh" <<EOT
@@ -287,3 +287,4 @@ EOT
 fi
 
 echo "Vault installation complete."
+
