@@ -283,5 +283,3 @@ EOT
 fi
 
 echo "Vault installation complete."
-
-#
