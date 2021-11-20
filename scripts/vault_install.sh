@@ -38,6 +38,7 @@ sudo setcap cap_ipc_lock=+ep /usr/local/bin/vault
 sudo tee -a /etc/environment <<EOF
 VAULT_ADDR=http://127.0.0.1:8200
 VAULT_SKIP_VERIFY=true
+VAULT_LICENSE=${VAULT_LICENSE}
 EOF
 
 . /etc/environment
@@ -121,7 +122,6 @@ echo "export VAULT_ADDR=http://127.0.0.1:8200" >> /root/.profile
 echo "export VAULT_TOKEN=$VAULT_TOKEN" >> /root/.profile
 echo "export VAULT_LICENSE=${VAULT_LICENSE}" >> /root/.profile
 echo "VAULT_TOKEN=$VAULT_TOKEN" >> /etc/environment
-echo "VAULT_LICENSE=${VAULT_LICENSE}" >> /etc/environment
 
 export NODE_INDEX=${NODE_INDEX}
 export NUM_NODES=${NUM_NODES}
