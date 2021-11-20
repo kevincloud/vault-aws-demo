@@ -82,7 +82,7 @@ And let's decode the token to obtain the original value
 
 vault write transform-fpe/decode/payments \\\\
     transformation=credit-card \\\\
-    value="XXXXX"
+    value="$CC_TOKEN"
 
 DESCRIPTION
 

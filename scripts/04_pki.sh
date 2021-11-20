@@ -63,7 +63,7 @@ vault secrets enable -path=example_com_pki pki
 
 vault write -field=certificate \\\\
     example_com_pki/root/generate/internal \\\\
-    common_name=example.com > /root/$CURRENT_DIRECTORY/ca_cert.crt
+    common_name=example.com > ca_cert.crt
 
 Press any key to continue...
 DESCRIPTION

@@ -6,7 +6,7 @@ export DEBIAN_FRONTEND=noninteractive
 sudo apt-get -y update > /dev/null 2>&1
 # sudo apt-get -y upgrade > /dev/null 2>&1
 sudo apt-get install -y unzip jq python3 python3-pip > /dev/null 2>&1
-pip3 install awscli
+pip3 install awscli Flask mysql-connector-python hvac
 
 sudo bash -c "cat >/root/sign_request.py" <<EOT
 #!/usr/bin/env python

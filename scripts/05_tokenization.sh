@@ -121,9 +121,9 @@ clear
 cat <<DESCRIPTION
 And let's decode the token to obtain the original value
 
-vault write transform/encode/mobile-pay \\\\
+vault write transform/decode/mobile-pay \\\\
     transformation=credit-card \\\\
-    value="XXXXX"
+    value="$CC_TOKEN"
 
 DESCRIPTION
 
@@ -166,6 +166,6 @@ chmod a+x /root/$CURRENT_DIRECTORY/run_auto.sh
 sudo bash -c "cat >/root/$CURRENT_DIRECTORY/reset.sh" <<EOT
 vault secrets disable transform > /dev/null
 service vault restart
-# echo "drop database $POSTGRES_DBNAME" | PGPASSWORD=$DB_PASS psql -h $TOKEN_DB_HOST -d postgres -U $DB_USER
+echo "drop table token_schema_versions, tokens" | PGPASSWORD=$DB_PASS psql -h $TOKEN_DB_HOST -d postgres -U $DB_USER
 EOT
 chmod a+x /root/$CURRENT_DIRECTORY/reset.sh

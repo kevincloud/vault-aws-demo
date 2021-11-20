@@ -124,6 +124,7 @@ echo "http://$VAULT_IP:5000/"
 cd ..
 echo "Press any key to continue..."
 read -n1 kbd
+pkill python3
 EOT
 chmod a+x /root/$CURRENT_DIRECTORY/run_interactive.sh
 
@@ -140,7 +141,9 @@ chmod a+x /root/$CURRENT_DIRECTORY/run_auto.sh
 
 sudo bash -c "cat >/root/$CURRENT_DIRECTORY/reset.sh" <<EOT
 vault secrets disable lob_a/workshop/transit > /dev/null
+pkill python3
 mv /root/$CURRENT_DIRECTORY/app/config.ini /root/$CURRENT_DIRECTORY/app/config-x.ini
 mv /root/$CURRENT_DIRECTORY/app/config-z.ini /root/$CURRENT_DIRECTORY/app/config.ini
+echo "drop table customers" | MYSQL_PWD=${DB_PASS} mysql -h $DB_HOST -u ${DB_USER} -D my_app
 EOT
 chmod a+x /root/$CURRENT_DIRECTORY/reset.sh
