@@ -1,7 +1,7 @@
 #!/bin/sh
 # Configures the Vault server for a database secrets demo
 
-echo "Preparing to install Vault..."
+echo "Preparing to install Vault...."
 echo 'libc6 libraries/restart-without-asking boolean true' | sudo debconf-set-selections
 echo "deb http://apt.postgresql.org/pub/repos/apt $(lsb_release -cs)-pgdg main" > /etc/apt/sources.list.d/pgdg.list
 wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | sudo apt-key add -
