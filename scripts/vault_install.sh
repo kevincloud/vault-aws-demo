@@ -50,7 +50,7 @@ storage "raft" {
   path = "/var/raft${NODE_INDEX}"
   node_id = "node${NODE_INDEX}"
   retry_join {
-     auto_join = "provider=aws addr_type=public_v4 region=${AWS_REGION} tag_key=${AUTOJOIN_KEY} tag_value=${AUTOJOIN_VALUE}"
+     auto_join = "provider=aws addr_type=private_v4 region=${AWS_REGION} tag_key=${AUTOJOIN_KEY} tag_value=${AUTOJOIN_VALUE}"
      auto_join_scheme = "http"
   }
 }
