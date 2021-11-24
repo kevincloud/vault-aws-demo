@@ -47,7 +47,7 @@ variable "kms_key_id" {
 
 variable "vault_dl_url" {
     type = string
-    default = "https://releases.hashicorp.com/vault/1.9.0/vault_1.9.0_linux_amd64.zip"
+    default = "https://releases.hashicorp.com/vault/1.9.0+ent/vault_1.9.0+ent_linux_amd64.zip"
 }
 
 variable "vault_license" {

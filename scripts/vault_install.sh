@@ -1,7 +1,7 @@
 #!/bin/sh
 # Configures the Vault server for a database secrets demo
 
-echo "Preparing to install Vault..."
+echo "Preparing to install Vault...."
 echo 'libc6 libraries/restart-without-asking boolean true' | sudo debconf-set-selections
 echo "deb http://apt.postgresql.org/pub/repos/apt $(lsb_release -cs)-pgdg main" > /etc/apt/sources.list.d/pgdg.list
 wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | sudo apt-key add -
@@ -50,7 +50,7 @@ storage "raft" {
   path = "/var/raft${NODE_INDEX}"
   node_id = "node${NODE_INDEX}"
   retry_join {
-     auto_join = "provider=aws addr_type=public_v4 region=${AWS_REGION} tag_key=${AUTOJOIN_KEY} tag_value=${AUTOJOIN_VALUE}"
+     auto_join = "provider=aws addr_type=private_v4 region=${AWS_REGION} tag_key=${AUTOJOIN_KEY} tag_value=${AUTOJOIN_VALUE}"
      auto_join_scheme = "http"
   }
 }
