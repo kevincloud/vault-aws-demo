@@ -95,11 +95,27 @@ username    vault_user
 
 # Demo Workflow
 
-From here you can launch each of the demos by executing either each one individually  or run them all using `runall.sh`
+From here you can launch each of the demos by executing the `run_interactive.sh` script found within each demo subdirectory or run them all using `runall.sh`
 
 ```
-/root # 
-01_database  02_ec2auth  03_eaas  04_pki  05_tokenization  06_fpe  init.txt  resetall.sh  runall.sh  snap  vault-aws-demo
+/root # ls -l
+total 44
+drwxr-xr-x 2 root root 4096 Nov 23 21:02 01_database
+drwxr-xr-x 2 root root 4096 Nov 23 21:02 02_ec2auth
+drwxr-xr-x 4 root root 4096 Nov 23 21:02 03_eaas
+drwxr-xr-x 2 root root 4096 Nov 23 21:02 04_pki
+drwxr-xr-x 2 root root 4096 Nov 23 21:02 05_tokenization
+drwxr-xr-x 2 root root 4096 Nov 23 21:02 06_fpe
+-rw-r--r-- 1 root root  267 Nov 23 21:02 init.txt
+-rwxr-xr-x 1 root root  215 Nov 23 21:03 resetall.sh
+-rwxr-xr-x 1 root root 1764 Nov 23 21:03 runall.sh
 ```
+
+
+## Demo 1: Dynamic Database Secrets with RDS MySQL
+
+![aws-rds](img/aws-rds.png)
+
+**Summary** Simple workflow to showcase dynamic database credentials for RDS MySQL. Demo will walk you through setting up two users, James(Operator) and Sally (AppDev), each with a policy that either allows them (James) or denies them (Sally) from generating database credenetials. 
 
 
