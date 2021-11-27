@@ -119,3 +119,8 @@ drwxr-xr-x 2 root root 4096 Nov 23 21:02 06_fpe
 **Summary** Simple workflow to showcase dynamic database credentials for RDS MySQL. Demo will walk you through setting up two users, James(Operator) and Sally (AppDev), each with a policy that either allows them (James) or denies them (Sally) from generating database credenetials. 
 
 
+## Demo 2: AWS IAM Authentication
+
+![aws-rds](img/aws-iam.png)
+
+**Summary** Simple workflow to showcase authenticating into Vault using the ec2's instance profile. Vault utilizes the AWS auth engine to validate the ec2 identity using its pkcs7 identity against the AWS API. Once validated, Vault returns a valid token with the attached policies.  
