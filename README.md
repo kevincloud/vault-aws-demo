@@ -2,7 +2,7 @@
 
 # Features
 
-* Auto unseal with AWS KMS
+* Auto Unseal with AWS KMS
 * Dynamic Database Secrets with RDS MySQL
 * AWS IAM Authentication
 * Encryption as a Service
