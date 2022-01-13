@@ -50,12 +50,11 @@ storage "raft" {
   path = "/var/raft${NODE_INDEX}"
   node_id = "node${NODE_INDEX}"
   retry_join {
-     auto_join = "provider=aws addr_type=public_v4 region=${AWS_REGION} tag_key=${AUTOJOIN_KEY} tag_value=${AUTOJOIN_VALUE}"
+     auto_join = "provider=aws addr_type=private_v4 region=${AWS_REGION} tag_key=${AUTOJOIN_KEY} tag_value=${AUTOJOIN_VALUE}"
      auto_join_scheme = "http"
   }
 }
 
-license_path = "/etc/vault.d/license.hclic"
 listener "tcp" {
   address     = "0.0.0.0:8200"
   cluster_address = "0.0.0.0:8201"
@@ -72,6 +71,10 @@ api_addr = "http://$PUBLIC_IP:8200"
 disable_mlock = true
 ui = true
 EOT
+
+if [ ! -z "${VAULT_LICENSE}" ]; then
+  echo "license_path = \"/etc/vault.d/license.hclic\"" >> /etc/vault.d/vault.hcl
+fi
 
 # Set Vault up as a systemd service
 echo "Installing systemd service for Vault..."
@@ -287,5 +290,3 @@ EOT
 fi
 
 echo "Vault installation complete."
-
-#
