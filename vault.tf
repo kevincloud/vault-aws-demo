@@ -19,7 +19,7 @@ resource "aws_instance" "vault-server" {
         POSTGRES_DBNAME = "${var.prefix}${var.postgres_dbname}"
         DB_USER = var.db_user
         DB_PASS = var.db_pass
-        AWS_KMS_KEY_ID = var.kms_key_id
+        AWS_KMS_KEY_ID =  aws_kms_key.vault.id
         VAULT_URL = var.vault_dl_url
         VAULT_LICENSE = var.vault_license
         CTPL_URL = var.consul_tpl_url
