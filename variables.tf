@@ -1,6 +1,6 @@
 variable "aws_region" {
     type = string
-    default = "us-east-1"
+    default = "us-east-2"
 }
 
 variable "key_pair" {
@@ -41,9 +41,9 @@ variable "postgres_dbname" {
     default = "tokenizationdb"
 }
 
-variable "kms_key_id" {
-    type = string
-}
+#variable "kms_key_id" {
+#    type = string
+#}
 
 variable "vault_dl_url" {
     type = string
