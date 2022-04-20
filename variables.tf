@@ -9,12 +9,12 @@ variable "key_pair" {
 
 variable "instance_type" {
     type = string
-    default = "t3.small"
+    default = "m5.xlarge"
 }
 
 variable "db_instance_type" {
     type = string
-    default = "t3.small"
+    default = "m5.xlarge"
 }
 
 variable "num_nodes" {
@@ -47,7 +47,7 @@ variable "postgres_dbname" {
 
 variable "vault_dl_url" {
     type = string
-    default = "https://releases.hashicorp.com/vault/1.9.0+ent/vault_1.9.0+ent_linux_amd64.zip"
+    default = "https://releases.hashicorp.com/vault/1.10.0+ent/vault_1.10.0+ent_linux_amd64.zip"
 }
 
 variable "vault_license" {
