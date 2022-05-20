@@ -5,7 +5,7 @@ resource "aws_db_instance" "vault-postgres" {
     engine_version = "13.3"
     instance_class = "db.${var.db_instance_type}"
     identifier = "${var.prefix}${var.postgres_dbname}"
-    name = "${var.prefix}${var.postgres_dbname}"
+    db_name = "${var.prefix}${var.postgres_dbname}"
     vpc_security_group_ids = [aws_security_group.vault-postgres-sg.id]
     db_subnet_group_name = aws_db_subnet_group.vault-db-subnet.id
     username = var.db_user
